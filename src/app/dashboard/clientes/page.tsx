@@ -199,12 +199,12 @@ export default function ClientesPage() {
       <div className="flex justify-between items-center">
         <div>
           <h2 className={`text-3xl font-bold tracking-tight transition-colors duration-200 ${
-            theme === 'dark' ? 'text-slate-800' : 'text-gray-900'
+            theme === 'dark' ? 'text-white' : 'text-gray-900'
           }`}>
             Gerenciar Clientes
           </h2>
           <p className={`mt-2 transition-colors duration-200 ${
-            theme === 'dark' ? 'text-slate-600' : 'text-gray-600'
+            theme === 'dark' ? 'text-slate-300' : 'text-gray-600'
           }`}>
             Cadastre, edite e gerencie todos os clientes da loja
           </p>
@@ -218,10 +218,14 @@ export default function ClientesPage() {
               Novo Cliente
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-md">
+          <DialogContent className={`sm:max-w-md transition-colors duration-200 ${
+            theme === 'dark' ? 'bg-slate-800 border-slate-700' : ''
+          }`}>
             <DialogHeader>
-              <DialogTitle>Adicionar Novo Cliente</DialogTitle>
-              <DialogDescription>
+              <DialogTitle className={theme === 'dark' ? 'text-white' : ''}>
+                Adicionar Novo Cliente
+              </DialogTitle>
+              <DialogDescription className={theme === 'dark' ? 'text-slate-300' : ''}>
                 Preencha os dados do novo cliente
               </DialogDescription>
             </DialogHeader>
@@ -232,7 +236,7 @@ export default function ClientesPage() {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className={theme === 'dark' ? 'text-slate-700' : ''}>
+                      <FormLabel className={theme === 'dark' ? 'text-slate-200' : ''}>
                         Nome Completo
                       </FormLabel>
                       <FormControl>
@@ -247,7 +251,7 @@ export default function ClientesPage() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className={theme === 'dark' ? 'text-slate-700' : ''}>
+                      <FormLabel className={theme === 'dark' ? 'text-slate-200' : ''}>
                         E-mail
                       </FormLabel>
                       <FormControl>
@@ -262,7 +266,7 @@ export default function ClientesPage() {
                   name="birthDate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className={theme === 'dark' ? 'text-slate-700' : ''}>
+                      <FormLabel className={theme === 'dark' ? 'text-slate-200' : ''}>
                         Data de Nascimento
                       </FormLabel>
                       <FormControl>
@@ -277,6 +281,7 @@ export default function ClientesPage() {
                     type="button"
                     variant="outline"
                     onClick={() => setIsCreateDialogOpen(false)}
+                    className={theme === 'dark' ? 'border-slate-600 text-slate-200 hover:bg-slate-700' : ''}
                   >
                     Cancelar
                   </Button>
@@ -289,19 +294,23 @@ export default function ClientesPage() {
       </div>
 
       {/* Filtros */}
-      <Card className={theme === 'dark' ? 'bg-white/90 border-slate-200/50' : ''}>
+      <Card className={`transition-colors duration-200 ${
+        theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white'
+      }`}>
         <CardHeader>
-          <CardTitle className={theme === 'dark' ? 'text-slate-800' : ''}>
+          <CardTitle className={`text-lg transition-colors duration-200 ${
+            theme === 'dark' ? 'text-white' : 'text-gray-900'
+          }`}>
             Filtros
           </CardTitle>
-          <CardDescription className={theme === 'dark' ? 'text-slate-600' : ''}>
+          <CardDescription className={theme === 'dark' ? 'text-slate-300' : ''}>
             Filtre os clientes por nome ou e-mail
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="name-filter" className={theme === 'dark' ? 'text-slate-700' : ''}>
+            <div className="space-y-2">
+              <Label htmlFor="name-filter" className={theme === 'dark' ? 'text-slate-200' : ''}>
                 Nome
               </Label>
               <Input
@@ -309,10 +318,11 @@ export default function ClientesPage() {
                 placeholder="Filtrar por nome..."
                 value={filters.name}
                 onChange={(e) => setFilters(prev => ({ ...prev, name: e.target.value }))}
+                className="h-10"
               />
             </div>
-            <div>
-              <Label htmlFor="email-filter" className={theme === 'dark' ? 'text-slate-700' : ''}>
+            <div className="space-y-2">
+              <Label htmlFor="email-filter" className={theme === 'dark' ? 'text-slate-200' : ''}>
                 E-mail
               </Label>
               <Input
@@ -320,6 +330,7 @@ export default function ClientesPage() {
                 placeholder="Filtrar por e-mail..."
                 value={filters.email}
                 onChange={(e) => setFilters(prev => ({ ...prev, email: e.target.value }))}
+                className="h-10"
               />
             </div>
           </div>
@@ -330,12 +341,12 @@ export default function ClientesPage() {
       {error && (
         <Card className={`transition-colors duration-200 ${
           theme === 'dark'
-            ? 'border-red-200 bg-red-50' 
-            : 'border-red-200 bg-red-50'
+            ? 'bg-red-900/20 border-red-700' 
+            : 'bg-red-50 border-red-200'
         }`}>
           <CardContent className="pt-6">
             <p className={`font-medium transition-colors duration-200 ${
-              theme === 'dark' ? 'text-red-700' : 'text-red-700'
+              theme === 'dark' ? 'text-red-300' : 'text-red-700'
             }`}>
               {error}
             </p>
@@ -344,12 +355,16 @@ export default function ClientesPage() {
       )}
 
       {/* Tabela de Clientes */}
-      <Card className={theme === 'dark' ? 'bg-white/90 border-slate-200/50' : ''}>
+      <Card className={`transition-colors duration-200 ${
+        theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white'
+      }`}>
         <CardHeader>
-          <CardTitle className={theme === 'dark' ? 'text-slate-800' : ''}>
+          <CardTitle className={`text-lg transition-colors duration-200 ${
+            theme === 'dark' ? 'text-white' : 'text-gray-900'
+          }`}>
             Clientes ({clients.length})
           </CardTitle>
-          <CardDescription className={theme === 'dark' ? 'text-slate-600' : ''}>
+          <CardDescription className={theme === 'dark' ? 'text-slate-300' : ''}>
             Lista completa de clientes cadastrados
           </CardDescription>
         </CardHeader>
@@ -358,44 +373,44 @@ export default function ClientesPage() {
             <div className="flex items-center justify-center py-8">
               <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
               <span className={`ml-2 transition-colors duration-200 ${
-                theme === 'dark' ? 'text-slate-600' : 'text-gray-600'
+                theme === 'dark' ? 'text-slate-300' : 'text-gray-600'
               }`}>
                 Carregando clientes...
               </span>
             </div>
           ) : clients.length === 0 ? (
             <div className={`text-center py-8 transition-colors duration-200 ${
-              theme === 'dark' ? 'text-slate-500' : 'text-gray-500'
+              theme === 'dark' ? 'text-slate-400' : 'text-gray-500'
             }`}>
               Nenhum cliente encontrado
             </div>
           ) : (
-            <Table>
+                        <Table>
               <TableHeader>
-                <TableRow className={theme === 'dark' ? 'border-slate-200' : ''}>
-                  <TableHead className={theme === 'dark' ? 'text-slate-700' : ''}>Nome</TableHead>
-                  <TableHead className={theme === 'dark' ? 'text-slate-700' : ''}>E-mail</TableHead>
-                  <TableHead className={theme === 'dark' ? 'text-slate-700' : ''}>Data de Nascimento</TableHead>
-                  <TableHead className={theme === 'dark' ? 'text-slate-700' : ''}>Letra Ausente</TableHead>
-                  <TableHead className={`text-right ${theme === 'dark' ? 'text-slate-700' : ''}`}>Ações</TableHead>
+                <TableRow className={theme === 'dark' ? 'border-slate-700' : ''}>
+                  <TableHead className={theme === 'dark' ? 'text-slate-200' : ''}>Nome</TableHead>
+                  <TableHead className={theme === 'dark' ? 'text-slate-200' : ''}>E-mail</TableHead>
+                  <TableHead className={theme === 'dark' ? 'text-slate-200' : ''}>Data de Nascimento</TableHead>
+                  <TableHead className={theme === 'dark' ? 'text-slate-200' : ''}>Letra Ausente</TableHead>
+                  <TableHead className={`text-right ${theme === 'dark' ? 'text-slate-200' : ''}`}>Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {clients.map((client) => (
-                  <TableRow key={client.id} className={theme === 'dark' ? 'border-slate-200' : ''}>
+                  <TableRow key={client.id} className={theme === 'dark' ? 'border-slate-700 hover:bg-slate-700/50' : ''}>
                     <TableCell className={`font-medium transition-colors duration-200 ${
-                      theme === 'dark' ? 'text-slate-800' : ''
+                      theme === 'dark' ? 'text-white' : ''
                     }`}>
                       {client.name}
                     </TableCell>
-                    <TableCell className={theme === 'dark' ? 'text-slate-600' : ''}>
+                    <TableCell className={theme === 'dark' ? 'text-slate-300' : ''}>
                       {client.email}
                     </TableCell>
-                    <TableCell className={theme === 'dark' ? 'text-slate-600' : ''}>
+                    <TableCell className={theme === 'dark' ? 'text-slate-300' : ''}>
                       {new Date(client.birthDate).toLocaleDateString('pt-BR')}
                     </TableCell>
                     <TableCell>
-                      <Badge variant={client.missingLetter === '-' ? 'default' : 'secondary'}>
+                      <Badge variant={client.missingLetter === '-' ? 'default' : 'secondary'} className={theme === 'dark' ? 'bg-slate-700 text-slate-200 border-slate-600' : ''}>
                         {client.missingLetter}
                       </Badge>
                     </TableCell>
@@ -405,6 +420,7 @@ export default function ClientesPage() {
                           variant="outline"
                           size="sm"
                           onClick={() => openEditDialog(client)}
+                          className={theme === 'dark' ? 'border-slate-600 text-slate-200 hover:bg-slate-700' : ''}
                         >
                           Editar
                         </Button>
@@ -412,6 +428,7 @@ export default function ClientesPage() {
                           variant="destructive"
                           size="sm"
                           onClick={() => deleteClient(client.id)}
+                          className="bg-red-600 hover:bg-red-700 text-white"
                         >
                           Deletar
                         </Button>
@@ -427,10 +444,14 @@ export default function ClientesPage() {
 
       {/* Diálogo de Edição */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className={`sm:max-w-md transition-colors duration-200 ${
+          theme === 'dark' ? 'bg-slate-800 border-slate-700' : ''
+        }`}>
           <DialogHeader>
-            <DialogTitle>Editar Cliente</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className={theme === 'dark' ? 'text-white' : ''}>
+              Editar Cliente
+            </DialogTitle>
+            <DialogDescription className={theme === 'dark' ? 'text-slate-300' : ''}>
               Modifique os dados do cliente
             </DialogDescription>
           </DialogHeader>
@@ -441,54 +462,55 @@ export default function ClientesPage() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className={theme === 'dark' ? 'text-slate-700' : ''}>
-                      Nome Completo
-                    </FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Nome do cliente" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={updateForm.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className={theme === 'dark' ? 'text-slate-700' : ''}>
-                      E-mail
-                    </FormLabel>
-                    <FormControl>
-                      <Input {...field} type="email" placeholder="cliente@email.com" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={updateForm.control}
-                name="birthDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className={theme === 'dark' ? 'text-slate-700' : ''}>
-                      Data de Nascimento
-                    </FormLabel>
-                    <FormControl>
-                      <Input {...field} type="date" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                                                                <FormLabel className={theme === 'dark' ? 'text-slate-200' : ''}>
+                        Nome Completo
+                      </FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Nome do cliente" className="h-10" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={updateForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className={theme === 'dark' ? 'text-slate-200' : ''}>
+                        E-mail
+                      </FormLabel>
+                      <FormControl>
+                        <Input {...field} type="email" placeholder="cliente@email.com" className="h-10" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={updateForm.control}
+                  name="birthDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className={theme === 'dark' ? 'text-slate-200' : ''}>
+                        Data de Nascimento
+                      </FormLabel>
+                      <FormControl>
+                        <Input {...field} type="date" className="h-10" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               <div className="flex justify-end space-x-2 pt-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsEditDialogOpen(false)}
-                >
-                  Cancelar
-                </Button>
+                                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsEditDialogOpen(false)}
+                    className={theme === 'dark' ? 'border-slate-600 text-slate-200 hover:bg-slate-700' : ''}
+                  >
+                    Cancelar
+                  </Button>
                 <Button type="submit">Salvar Alterações</Button>
               </div>
             </form>

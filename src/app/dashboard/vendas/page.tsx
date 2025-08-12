@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useApi } from '@/hooks/useApi';
+import { useTheme } from '@/contexts/ThemeContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -41,6 +42,7 @@ interface Sale {
 
 export default function VendasPage() {
   const { get, post } = useApi();
+  const { theme } = useTheme();
   const [sales, setSales] = useState<Sale[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -130,8 +132,14 @@ export default function VendasPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900">Gerenciar Vendas</h2>
-          <p className="text-gray-600 mt-2">
+          <h2 className={`text-3xl font-bold tracking-tight transition-colors duration-200 ${
+            theme === 'dark' ? 'text-white' : 'text-gray-900'
+          }`}>
+            Gerenciar Vendas
+          </h2>
+          <p className={`mt-2 transition-colors duration-200 ${
+            theme === 'dark' ? 'text-slate-300' : 'text-gray-600'
+          }`}>
             Cadastre e acompanhe todas as vendas da loja
           </p>
         </div>
@@ -230,30 +238,50 @@ export default function VendasPage() {
 
       {/* Erro */}
       {error && (
-        <Card className="border-red-200 bg-red-50">
+        <Card className={`transition-colors duration-200 ${
+          theme === 'dark'
+            ? 'bg-red-900/20 border-red-700' 
+            : 'bg-red-50 border-red-200'
+        }`}>
           <CardContent className="pt-6">
-            <p className="text-red-700 font-medium">{error}</p>
+            <p className={`font-medium transition-colors duration-200 ${
+              theme === 'dark' ? 'text-red-300' : 'text-red-700'
+            }`}>
+              {error}
+            </p>
           </CardContent>
         </Card>
       )}
 
       {/* Resumo */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="text-center">
+        <Card className={`text-center transition-colors duration-200 ${
+          theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white'
+        }`}>
           <CardContent className="pt-6">
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+            <div className={`w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-3 transition-colors duration-200 ${
+              theme === 'dark' ? 'bg-blue-900/30' : 'bg-blue-100'
+            }`}>
               <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
             </div>
             <div className="text-2xl font-bold text-blue-600">{sales.length}</div>
-            <div className="text-sm text-gray-600">Total de Vendas</div>
+            <div className={`text-sm transition-colors duration-200 ${
+              theme === 'dark' ? 'text-slate-300' : 'text-gray-600'
+            }`}>
+              Total de Vendas
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="text-center">
+        <Card className={`text-center transition-colors duration-200 ${
+          theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white'
+        }`}>
           <CardContent className="pt-6">
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+            <div className={`w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-3 transition-colors duration-200 ${
+              theme === 'dark' ? 'bg-green-900/30' : 'bg-green-100'
+            }`}>
               <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
               </svg>
@@ -261,13 +289,21 @@ export default function VendasPage() {
             <div className="text-2xl font-bold text-green-600">
               {formatCurrency(sales.reduce((sum, sale) => sum + sale.value, 0))}
             </div>
-            <div className="text-sm text-gray-600">Valor Total</div>
+            <div className={`text-sm transition-colors duration-200 ${
+              theme === 'dark' ? 'text-slate-300' : 'text-gray-600'
+            }`}>
+              Valor Total
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="text-center">
+        <Card className={`text-center transition-colors duration-200 ${
+          theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white'
+        }`}>
           <CardContent className="pt-6">
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+            <div className={`w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-3 transition-colors duration-200 ${
+              theme === 'dark' ? 'bg-purple-900/30' : 'bg-purple-100'
+            }`}>
               <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
@@ -275,48 +311,74 @@ export default function VendasPage() {
             <div className="text-2xl font-bold text-purple-600">
               {sales.length > 0 ? sales.length : 0}
             </div>
-            <div className="text-sm text-gray-600">Clientes Atendidos</div>
+            <div className={`text-sm transition-colors duration-200 ${
+              theme === 'dark' ? 'text-slate-300' : 'text-gray-600'
+            }`}>
+              Clientes Atendidos
+            </div>
           </CardContent>
         </Card>
       </div>
 
       {/* Lista de Vendas */}
-      <Card>
+      <Card className={`transition-colors duration-200 ${
+        theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white'
+      }`}>
         <CardHeader>
-          <CardTitle>Histórico de Vendas</CardTitle>
-          <CardDescription>
+          <CardTitle className={theme === 'dark' ? 'text-white' : ''}>
+            Histórico de Vendas
+          </CardTitle>
+          <CardDescription className={theme === 'dark' ? 'text-slate-300' : ''}>
             Todas as vendas registradas na loja
           </CardDescription>
         </CardHeader>
         <CardContent>
           {sales.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className={`text-center py-8 transition-colors duration-200 ${
+              theme === 'dark' ? 'text-slate-400' : 'text-gray-500'
+            }`}>
+              <svg className={`w-16 h-16 mx-auto mb-4 transition-colors duration-200 ${
+                theme === 'dark' ? 'text-slate-600' : 'text-gray-300'
+              }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
-              <p className="text-lg font-medium">Nenhuma venda registrada</p>
-              <p className="text-sm">As vendas aparecerão aqui quando forem cadastradas</p>
+              <p className={`text-lg font-medium transition-colors duration-200 ${
+                theme === 'dark' ? 'text-slate-300' : ''
+              }`}>
+                Nenhuma venda registrada
+              </p>
+              <p className={`text-sm transition-colors duration-200 ${
+                theme === 'dark' ? 'text-slate-400' : ''
+              }`}>
+                As vendas aparecerão aqui quando forem cadastradas
+              </p>
             </div>
           ) : (
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>Cliente</TableHead>
-                  <TableHead>Valor</TableHead>
-                  <TableHead>Data</TableHead>
-                  <TableHead>Status</TableHead>
+                <TableRow className={theme === 'dark' ? 'border-slate-700' : ''}>
+                  <TableHead className={theme === 'dark' ? 'text-slate-200' : ''}>Cliente</TableHead>
+                  <TableHead className={theme === 'dark' ? 'text-slate-200' : ''}>Valor</TableHead>
+                  <TableHead className={theme === 'dark' ? 'text-slate-200' : ''}>Data</TableHead>
+                  <TableHead className={theme === 'dark' ? 'text-slate-200' : ''}>Status</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {sales.map((sale) => (
-                  <TableRow key={sale.id}>
-                    <TableCell className="font-medium">{sale.clientName}</TableCell>
+                  <TableRow key={sale.id} className={theme === 'dark' ? 'border-slate-700 hover:bg-slate-700/50' : ''}>
+                    <TableCell className={`font-medium transition-colors duration-200 ${
+                      theme === 'dark' ? 'text-white' : ''
+                    }`}>
+                      {sale.clientName}
+                    </TableCell>
                     <TableCell className="font-medium text-green-600">
                       {formatCurrency(sale.value)}
                     </TableCell>
-                    <TableCell>{formatDate(sale.date)}</TableCell>
+                    <TableCell className={theme === 'dark' ? 'text-slate-300' : ''}>
+                      {formatDate(sale.date)}
+                    </TableCell>
                     <TableCell>
-                      <Badge variant="default" className="bg-green-100 text-green-800">
+                      <Badge variant="default" className={theme === 'dark' ? 'bg-green-900/30 text-green-300 border-green-700' : 'bg-green-100 text-green-800'}>
                         Concluída
                       </Badge>
                     </TableCell>
