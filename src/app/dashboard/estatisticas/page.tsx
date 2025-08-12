@@ -525,20 +525,20 @@ export default function EstatisticasPage() {
               <table className="w-full">
                 <thead>
                   <tr className={`border-b transition-colors duration-200 ${
-                    theme === 'dark' ? 'border-slate-200' : 'border-gray-200'
+                    theme === 'dark' ? 'border-slate-700' : 'border-gray-200'
                   }`}>
                     <th className={`text-left py-3 px-4 font-medium transition-colors duration-200 ${
-                      theme === 'dark' ? 'text-slate-700' : 'text-gray-700'
+                      theme === 'dark' ? 'text-slate-200' : 'text-gray-700'
                     }`}>
                       Data
                     </th>
                     <th className={`text-right py-3 px-4 font-medium transition-colors duration-200 ${
-                      theme === 'dark' ? 'text-slate-700' : 'text-gray-700'
+                      theme === 'dark' ? 'text-slate-200' : 'text-gray-700'
                     }`}>
                       Total Vendido
                     </th>
                     <th className={`text-right py-3 px-4 font-medium transition-colors duration-200 ${
-                      theme === 'dark' ? 'text-slate-700' : 'text-gray-700'
+                      theme === 'dark' ? 'text-slate-200' : 'text-gray-700'
                     }`}>
                       % do Total
                     </th>
@@ -548,21 +548,21 @@ export default function EstatisticasPage() {
                   {dailySales.map((sale, index) => (
                     <tr key={sale.date} className={`border-b transition-colors duration-200 ${
                       theme === 'dark' 
-                        ? 'border-slate-200 hover:bg-slate-50' 
+                        ? 'border-slate-700 hover:bg-slate-700/50' 
                         : 'border-gray-200 hover:bg-gray-50'
                     }`}>
                       <td className={`py-3 px-4 transition-colors duration-200 ${
-                        theme === 'dark' ? 'text-slate-800' : 'text-gray-900'
+                        theme === 'dark' ? 'text-white' : 'text-gray-900'
                       }`}>
                         {formatDate(sale.date)}
                       </td>
                       <td className={`py-3 px-4 text-right font-medium transition-colors duration-200 ${
-                        theme === 'dark' ? 'text-slate-800' : 'text-gray-900'
+                        theme === 'dark' ? 'text-white' : 'text-gray-900'
                       }`}>
                         {formatCurrency(sale.total)}
                       </td>
                       <td className={`py-3 px-4 text-right transition-colors duration-200 ${
-                        theme === 'dark' ? 'text-slate-500' : 'text-gray-500'
+                        theme === 'dark' ? 'text-slate-300' : 'text-gray-500'
                       }`}>
                         {totalSales > 0 ? ((sale.total / totalSales) * 100).toFixed(1) : 0}%
                       </td>
@@ -571,20 +571,20 @@ export default function EstatisticasPage() {
                 </tbody>
                 <tfoot>
                   <tr className={`font-medium transition-colors duration-200 ${
-                    theme === 'dark' ? 'bg-slate-50' : 'bg-gray-50'
+                    theme === 'dark' ? 'bg-slate-700' : 'bg-gray-50'
                   }`}>
                     <td className={`py-3 px-4 transition-colors duration-200 ${
-                      theme === 'dark' ? 'text-slate-800' : 'text-gray-900'
+                      theme === 'dark' ? 'text-white' : 'text-gray-900'
                     }`}>
                       Total Geral
                     </td>
                     <td className={`py-3 px-4 text-right transition-colors duration-200 ${
-                      theme === 'dark' ? 'text-slate-800' : 'text-gray-900'
+                      theme === 'dark' ? 'text-white' : 'text-gray-900'
                     }`}>
                       {formatCurrency(totalSales)}
                     </td>
                     <td className={`py-3 px-4 text-right transition-colors duration-200 ${
-                      theme === 'dark' ? 'text-slate-800' : 'text-gray-900'
+                      theme === 'dark' ? 'text-white' : 'text-gray-900'
                     }`}>
                       100%
                     </td>
