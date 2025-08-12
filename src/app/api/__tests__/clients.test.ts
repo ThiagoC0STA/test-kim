@@ -12,7 +12,8 @@ jest.mock("@/lib/supabase", () => ({
 jest.mock("@/lib/middleware", () => ({
   requireAuth: jest.fn(() => ({
     ok: true,
-    user: { id: "test-user-id" },
+    userId: "test-user-id",
+    email: "test@example.com",
   })),
 }));
 
@@ -37,9 +38,11 @@ describe("API Clients", () => {
       mockSupabase.from.mockReturnValueOnce({
         select: jest.fn(() => ({
           eq: jest.fn(() => ({
-            single: jest.fn(() => ({
-              data: null,
-              error: null,
+            eq: jest.fn(() => ({
+              single: jest.fn(() => ({
+                data: null,
+                error: null,
+              })),
             })),
           })),
         })),
@@ -80,9 +83,11 @@ describe("API Clients", () => {
       mockSupabase.from.mockReturnValue({
         select: jest.fn(() => ({
           eq: jest.fn(() => ({
-            single: jest.fn(() => ({
-              data: { id: "existing-id" },
-              error: null,
+            eq: jest.fn(() => ({
+              single: jest.fn(() => ({
+                data: { id: "existing-id" },
+                error: null,
+              })),
             })),
           })),
         })),
@@ -135,8 +140,10 @@ describe("API Clients", () => {
 
       mockSupabase.from.mockReturnValue({
         select: jest.fn(() => ({
-          data: mockClients,
-          error: null,
+          eq: jest.fn(() => ({
+            data: mockClients,
+            error: null,
+          })),
         })),
       });
 
@@ -145,7 +152,6 @@ describe("API Clients", () => {
       const data = await response.json();
 
       expect(response.status).toBe(200);
-      // A API retorna um formato específico, vamos verificar a estrutura correta
       expect(data.data.clientes).toBeDefined();
       expect(data.data.clientes[0].info.nomeCompleto).toBe("Ana Beatriz");
     });
@@ -162,9 +168,11 @@ describe("API Clients", () => {
 
       mockSupabase.from.mockReturnValue({
         select: jest.fn(() => ({
-          ilike: jest.fn(() => ({
-            data: mockClients,
-            error: null,
+          eq: jest.fn(() => ({
+            ilike: jest.fn(() => ({
+              data: mockClients,
+              error: null,
+            })),
           })),
         })),
       });
@@ -183,8 +191,10 @@ describe("API Clients", () => {
     it("should return error when database fails", async () => {
       mockSupabase.from.mockReturnValue({
         select: jest.fn(() => ({
-          data: null,
-          error: { message: "Database connection failed" },
+          eq: jest.fn(() => ({
+            data: null,
+            error: { message: "Database connection failed" },
+          })),
         })),
       });
 

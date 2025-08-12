@@ -7,10 +7,11 @@ export async function GET(req: NextRequest) {
   if (!auth.ok) return auth.response!;
 
   try {
-    // Buscar vendas agrupadas por dia
+    // Buscar vendas do usuário agrupadas por dia
     const { data, error } = await supabase
       .from("sales")
       .select("date, value")
+      .eq("user_id", auth.userId) // ← REATIVADO: FILTRO OBRIGATÓRIO POR USUÁRIO
       .order("date");
 
     if (error) {

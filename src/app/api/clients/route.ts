@@ -21,11 +21,12 @@ export async function POST(req: NextRequest) {
     const json = await req.json();
     const { name, email, birthDate } = CreateClientSchema.parse(json);
 
-    // Verificar se email já existe
+    // Verificar se email já existe PARA ESTE USUÁRIO
     const { data: existing } = await supabase
       .from("clients")
       .select("id")
       .eq("email", email)
+      .eq("user_id", auth.userId) // ← REATIVADO: FILTRO POR USUÁRIO
       .single();
 
     if (existing) {
@@ -35,10 +36,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Criar cliente
+    // Criar cliente COM user_id
     const { data, error } = await supabase
       .from("clients")
-      .insert({ name, email, birth_date: birthDate })
+      .insert({
+        name,
+        email,
+        birth_date: birthDate,
+        user_id: auth.userId, // ← REATIVADO: ASSOCIAR AO USUÁRIO
+      })
       .select("id, name, email, birth_date")
       .single();
 
@@ -82,7 +88,13 @@ export async function GET(req: NextRequest) {
     const name = searchParams.get("name");
     const email = searchParams.get("email");
 
-    let query = supabase.from("clients").select("id, name, email, birth_date");
+    console.log("🔍 Buscando clientes para usuário:", auth.userId);
+
+    // SEMPRE filtrar por user_id para isolar dados
+    let query = supabase
+      .from("clients")
+      .select("id, name, email, birth_date")
+      .eq("user_id", auth.userId); // ← REATIVADO: FILTRO OBRIGATÓRIO POR USUÁRIO
 
     if (name) {
       query = query.ilike("name", `%${name}%`);
@@ -95,16 +107,19 @@ export async function GET(req: NextRequest) {
     const { data, error } = await query;
 
     if (error) {
+      console.error("❌ Erro do Supabase:", error);
       return NextResponse.json(
         { message: "Erro ao listar clientes", error: error.message },
         { status: 500 }
       );
     }
 
+    console.log("✅ Clientes encontrados:", data?.length || 0);
+
     const response = {
       data: {
         clientes: data.map((client) => ({
-          id: client.id, // Usar o ID real do Supabase
+          id: client.id,
           info: {
             nomeCompleto: client.name,
             detalhes: {
@@ -131,8 +146,9 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(response);
   } catch (error: any) {
+    console.error("💥 Erro inesperado:", error);
     return NextResponse.json(
-      { message: "Erro interno do servidor" },
+      { message: "Erro interno do servidor", error: error.message },
       { status: 500 }
     );
   }
@@ -168,7 +184,20 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    console.log("Tentando atualizar cliente com ID:", id);
+    // Verificar se o cliente pertence ao usuário ANTES de atualizar
+    const { data: existingClient } = await supabase
+      .from("clients")
+      .select("id")
+      .eq("id", id)
+      .eq("user_id", auth.userId) // ← VERIFICAR PROPRIEDADE
+      .single();
+
+    if (!existingClient) {
+      return NextResponse.json(
+        { message: "Cliente não encontrado ou não pertence ao usuário" },
+        { status: 404 }
+      );
+    }
 
     // Preparar dados para atualização
     const updateData: any = {};
@@ -176,11 +205,12 @@ export async function PATCH(req: NextRequest) {
     if (updates.email) updateData.email = updates.email;
     if (updates.birthDate) updateData.birth_date = updates.birthDate;
 
-    // Atualizar cliente
+    // Atualizar cliente (já verificado que pertence ao usuário)
     const { data, error } = await supabase
       .from("clients")
       .update(updateData)
       .eq("id", id)
+      .eq("user_id", auth.userId) // ← DUPLA VERIFICAÇÃO
       .select("id, name, email, birth_date")
       .single();
 
@@ -242,22 +272,40 @@ export async function DELETE(req: NextRequest) {
       );
     }
 
-    console.log("Tentando deletar cliente com ID:", id);
+    // Verificar se o cliente pertence ao usuário ANTES de deletar
+    const { data: existingClient } = await supabase
+      .from("clients")
+      .select("id")
+      .eq("id", id)
+      .eq("user_id", auth.userId) // ← VERIFICAR PROPRIEDADE
+      .single();
 
-    // Deletar cliente
-    const { error } = await supabase.from("clients").delete().eq("id", id);
+    if (!existingClient) {
+      return NextResponse.json(
+        { message: "Cliente não encontrado ou não pertence ao usuário" },
+        { status: 404 }
+      );
+    }
+
+    // Deletar cliente (já verificado que pertence ao usuário)
+    const { error } = await supabase
+      .from("clients")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", auth.userId); // ← DUPLA VERIFICAÇÃO
 
     if (error) {
-      console.error("Erro do Supabase:", error);
       return NextResponse.json(
         { message: "Erro ao deletar cliente", error: error.message },
         { status: 500 }
       );
     }
 
-    return NextResponse.json({ message: "Cliente deletado com sucesso" });
+    return NextResponse.json(
+      { message: "Cliente deletado com sucesso" },
+      { status: 200 }
+    );
   } catch (error: any) {
-    console.error("Erro interno:", error);
     return NextResponse.json(
       { message: "Erro interno do servidor" },
       { status: 500 }

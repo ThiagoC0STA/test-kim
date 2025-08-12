@@ -7,10 +7,11 @@ export async function GET(req: NextRequest) {
   if (!auth.ok) return auth.response!;
 
   try {
-    // Buscar todos os clientes com suas vendas
+    // Buscar clientes do usuário com suas vendas
     const { data: clients, error: clientsError } = await supabase
       .from("clients")
-      .select("id, name, email");
+      .select("id, name, email")
+      .eq("user_id", auth.userId); // ← REATIVADO: FILTRO OBRIGATÓRIO POR USUÁRIO
 
     if (clientsError) {
       return NextResponse.json(
@@ -19,10 +20,11 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Buscar todas as vendas
+    // Buscar vendas do usuário
     const { data: sales, error: salesError } = await supabase
       .from("sales")
-      .select("client_id, value, date");
+      .select("client_id, value, date")
+      .eq("user_id", auth.userId); // ← REATIVADO: FILTRO OBRIGATÓRIO POR USUÁRIO
 
     if (salesError) {
       return NextResponse.json(

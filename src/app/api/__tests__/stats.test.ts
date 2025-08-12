@@ -13,7 +13,8 @@ jest.mock("@/lib/supabase", () => ({
 jest.mock("@/lib/middleware", () => ({
   requireAuth: jest.fn(() => ({
     ok: true,
-    user: { id: "test-user-id" },
+    userId: "test-user-id",
+    email: "test@example.com",
   })),
 }));
 
@@ -29,8 +30,12 @@ describe("API Stats", () => {
     it("should return error when database query fails", async () => {
       mockSupabase.from.mockReturnValue({
         select: jest.fn(() => ({
-          data: null,
-          error: { message: "Query failed" },
+          eq: jest.fn(() => ({
+            order: jest.fn(() => ({
+              data: null,
+              error: { message: "Query failed" },
+            })),
+          })),
         })),
       });
 
@@ -41,7 +46,7 @@ describe("API Stats", () => {
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.message).toBe("Erro interno do servidor");
+      expect(data.message).toBe("Erro ao carregar estatísticas");
     });
   });
 
@@ -49,8 +54,10 @@ describe("API Stats", () => {
     it("should return error when first query fails", async () => {
       mockSupabase.from.mockReturnValue({
         select: jest.fn(() => ({
-          data: null,
-          error: { message: "First query failed" },
+          eq: jest.fn(() => ({
+            data: null,
+            error: { message: "First query failed" },
+          })),
         })),
       });
 
@@ -69,15 +76,19 @@ describe("API Stats", () => {
       mockSupabase.from
         .mockReturnValueOnce({
           select: jest.fn(() => ({
-            data: [{ client_id: "client-1", name: "Ana" }],
-            error: null,
+            eq: jest.fn(() => ({
+              data: [{ client_id: "client-1", name: "Ana" }],
+              error: null,
+            })),
           })),
         })
         // Segunda query falha
         .mockReturnValueOnce({
           select: jest.fn(() => ({
-            data: null,
-            error: { message: "Second query failed" },
+            eq: jest.fn(() => ({
+              data: null,
+              error: { message: "Second query failed" },
+            })),
           })),
         });
 

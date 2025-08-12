@@ -17,27 +17,28 @@ export async function POST(req: NextRequest) {
     const json = await req.json();
     const { clientId, value, date } = CreateSaleSchema.parse(json);
 
-    // Verificar se cliente existe
+    // Verificar se cliente existe E pertence ao usuário
     const { data: client, error: clientError } = await supabase
       .from("clients")
       .select("id")
       .eq("id", clientId)
-      .single();
+      .eq("user_id", auth.userId); // ← REATIVADO: VERIFICAR PROPRIEDADE
 
     if (clientError || !client) {
       return NextResponse.json(
-        { message: "Cliente não encontrado" },
+        { message: "Cliente não encontrado ou não pertence ao usuário" },
         { status: 404 }
       );
     }
 
-    // Criar venda
+    // Criar venda COM user_id
     const { data, error } = await supabase
       .from("sales")
       .insert({
         client_id: clientId,
         value,
         date,
+        user_id: auth.userId, // ← REATIVADO: ASSOCIAR AO USUÁRIO
       })
       .select("id, client_id, value, date")
       .single();
@@ -78,7 +79,7 @@ export async function GET(req: NextRequest) {
   if (!auth.ok) return auth.response!;
 
   try {
-    // Buscar vendas com informações do cliente
+    // Buscar vendas do usuário com informações do cliente
     const { data, error } = await supabase
       .from("sales")
       .select(
@@ -93,6 +94,7 @@ export async function GET(req: NextRequest) {
         )
       `
       )
+      .eq("user_id", auth.userId) // ← REATIVADO: FILTRO OBRIGATÓRIO POR USUÁRIO
       .order("date", { ascending: false });
 
     if (error) {
@@ -102,16 +104,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Formatar resposta
-    const formattedSales = data.map((sale: any) => ({
-      id: sale.id,
-      clientId: sale.clients?.id,
-      clientName: sale.clients?.name || "Cliente não encontrado",
-      value: Number(sale.value),
-      date: sale.date,
-    }));
-
-    return NextResponse.json(formattedSales);
+    return NextResponse.json(data);
   } catch (error: any) {
     return NextResponse.json(
       { message: "Erro interno do servidor" },
