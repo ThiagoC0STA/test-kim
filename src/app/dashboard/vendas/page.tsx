@@ -133,14 +133,14 @@ export default function VendasPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0 px-4 md:px-0">
         <div>
-          <h2 className={`text-3xl font-bold tracking-tight transition-colors duration-200 ${
+          <h2 className={`text-2xl sm:text-3xl font-bold tracking-tight transition-colors duration-200 ${
             theme === 'dark' ? 'text-white' : 'text-gray-900'
           }`}>
             Gerenciar Vendas
           </h2>
-          <p className={`mt-2 transition-colors duration-200 ${
+          <p className={`mt-2 text-sm sm:text-base transition-colors duration-200 ${
             theme === 'dark' ? 'text-slate-300' : 'text-gray-600'
           }`}>
             Cadastre e acompanhe todas as vendas da loja

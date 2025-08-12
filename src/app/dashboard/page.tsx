@@ -84,16 +84,16 @@ export default function DashboardPage() {
   return (
     <div className="space-y-8">
       {/* Welcome Section */}
-      <div className="text-center space-y-4">
+      <div className="text-center space-y-4 px-4">
         <h2
-          className={`text-4xl font-bold tracking-tight transition-colors duration-200 ${
+          className={`text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight transition-colors duration-200 ${
             theme === "dark" ? "text-white" : "text-gray-900"
           }`}
         >
           Bem-vindo ao Toy Store Admin
         </h2>
         <p
-          className={`text-xl max-w-2xl mx-auto transition-colors duration-200 ${
+          className={`text-base sm:text-lg md:text-xl max-w-2xl mx-auto transition-colors duration-200 ${
             theme === "dark" ? "text-slate-300" : "text-gray-600"
           }`}
         >
@@ -131,7 +131,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 px-4 md:px-0">
         <Card
           className={`hover:shadow-lg transition-all duration-200 ${
             theme === "dark" ? "bg-slate-800 border-slate-700" : "bg-white"
@@ -311,7 +311,7 @@ export default function DashboardPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 px-4">
             <div className="space-y-2">
               <p
                 className={`text-sm font-medium transition-colors duration-200 ${
@@ -355,7 +355,7 @@ export default function DashboardPage() {
 
       {/* Quick Stats */}
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 px-4 md:px-0">
           {Array.from({ length: 4 }).map((_, index) => (
             <Card
               key={index}
@@ -390,7 +390,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 px-4 md:px-0">
           <Card
             className={`text-center p-6 transition-colors duration-200 ${
               theme === "dark" ? "bg-slate-800 border-slate-700" : "bg-white"

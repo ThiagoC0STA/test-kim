@@ -35,6 +35,7 @@ type UpdateClientForm = z.infer<typeof UpdateClientSchema>;
 interface RawClientResponse {
   data: {
     clientes: Array<{
+      id?: string; // ID real do Supabase
       info?: {
         nomeCompleto?: string;
         detalhes?: {
@@ -73,6 +74,8 @@ export default function ClientesPage() {
   const [error, setError] = useState<string | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [deletingClient, setDeletingClient] = useState<Client | null>(null);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [filters, setFilters] = useState({ name: '', email: '' });
 
@@ -97,7 +100,7 @@ export default function ClientesPage() {
         if (!name || !email) return null;
 
         return {
-          id: Math.random().toString(36).substr(2, 9), // ID temporário para frontend
+          id: item.id || Math.random().toString(36).substr(2, 9), // Usar ID real do Supabase se disponível
           name,
           email,
           birthDate,
@@ -161,16 +164,31 @@ export default function ClientesPage() {
     }
   };
 
+  // Abrir diálogo de confirmação de exclusão
+  const openDeleteDialog = (client: Client) => {
+    setDeletingClient(client);
+    setIsDeleteDialogOpen(true);
+  };
+
   // Deletar cliente
-  const deleteClient = async (clientId: string) => {
-    if (!confirm('Tem certeza que deseja deletar este cliente?')) return;
+  const deleteClient = async () => {
+    if (!deletingClient) return;
 
     try {
-      const response = await del(`/clients?id=${clientId}`);
-      if (!response.ok) throw new Error('Erro ao deletar cliente');
+      console.log('Tentando deletar cliente:', deletingClient.id, deletingClient.name);
+      const response = await del(`/clients?id=${deletingClient.id}`);
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Erro na resposta:', errorData);
+        throw new Error(errorData.message || 'Erro ao deletar cliente');
+      }
 
       loadClients();
+      setIsDeleteDialogOpen(false);
+      setDeletingClient(null);
     } catch (err: any) {
+      console.error('Erro ao deletar cliente:', err);
       setError(err.message || 'Erro ao deletar cliente');
     }
   };
@@ -199,14 +217,14 @@ export default function ClientesPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0 px-4 md:px-0">
         <div>
-          <h2 className={`text-3xl font-bold tracking-tight transition-colors duration-200 ${
+          <h2 className={`text-2xl sm:text-3xl font-bold tracking-tight transition-colors duration-200 ${
             theme === 'dark' ? 'text-white' : 'text-gray-900'
           }`}>
             Gerenciar Clientes
           </h2>
-          <p className={`mt-2 transition-colors duration-200 ${
+          <p className={`mt-2 text-sm sm:text-base transition-colors duration-200 ${
             theme === 'dark' ? 'text-slate-300' : 'text-gray-600'
           }`}>
             Cadastre, edite e gerencie todos os clientes da loja
@@ -318,7 +336,7 @@ export default function ClientesPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-4">
             <div className="space-y-2">
               <Label htmlFor="name-filter" className={theme === 'dark' ? 'text-slate-200' : ''}>
                 Nome
@@ -430,7 +448,7 @@ export default function ClientesPage() {
                         <Button
                           variant="destructive"
                           size="sm"
-                          onClick={() => deleteClient(client.id)}
+                          onClick={() => openDeleteDialog(client)}
                           className="bg-red-600 hover:bg-red-700 text-white"
                         >
                           Deletar
@@ -525,6 +543,63 @@ export default function ClientesPage() {
               </div>
             </form>
           </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Diálogo de Confirmação de Exclusão */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className={`sm:max-w-md transition-colors duration-200 ${
+          theme === 'dark' ? 'bg-slate-800 border-slate-700' : ''
+        }`}>
+          <DialogHeader>
+            <DialogTitle className={theme === 'dark' ? 'text-white' : ''}>
+              Confirmar Exclusão
+            </DialogTitle>
+            <DialogDescription className={theme === 'dark' ? 'text-slate-300' : ''}>
+              Tem certeza que deseja deletar este cliente?
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className={`p-4 rounded-lg border transition-colors duration-200 ${
+              theme === 'dark' ? 'bg-slate-700/50 border-slate-600' : 'bg-gray-50 border-gray-200'
+            }`}>
+              <div className="space-y-2">
+                <p className={`font-medium transition-colors duration-200 ${
+                  theme === 'dark' ? 'text-white' : 'text-gray-900'
+                }`}>
+                  {deletingClient?.name}
+                </p>
+                <p className={`text-sm transition-colors duration-200 ${
+                  theme === 'dark' ? 'text-slate-300' : 'text-gray-600'
+                }`}>
+                  {deletingClient?.email}
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex justify-end space-x-2 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setIsDeleteDialogOpen(false);
+                  setDeletingClient(null);
+                }}
+                className={theme === 'dark' ? 'border-slate-600 text-slate-200 hover:bg-slate-700' : ''}
+              >
+                Cancelar
+              </Button>
+              <Button 
+                type="button"
+                variant="destructive"
+                onClick={deleteClient}
+                className="bg-red-600 hover:bg-red-700 text-white"
+              >
+                Deletar Cliente
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

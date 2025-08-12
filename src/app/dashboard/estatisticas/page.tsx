@@ -126,7 +126,7 @@ export default function EstatisticasPage() {
         </div>
 
         {/* Gráficos Skeleton - Versão simplificada */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 px-4">
           <div className="space-y-4">
             <Skeleton className="h-5 w-32 mx-auto" />
             <div className="h-72 w-full bg-white dark:bg-slate-800 rounded-lg border dark:border-slate-700 p-4">
@@ -165,16 +165,16 @@ export default function EstatisticasPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="text-center space-y-4">
+      <div className="text-center space-y-4 px-4">
         <h2
-          className={`text-3xl font-bold tracking-tight transition-colors duration-200 ${
+          className={`text-2xl sm:text-3xl font-bold tracking-tight transition-colors duration-200 ${
             theme === "dark" ? "text-white" : "text-gray-900"
           }`}
         >
           Estatísticas da Loja
         </h2>
         <p
-          className={`text-xl max-w-2xl mx-auto transition-colors duration-200 ${
+          className={`text-base sm:text-lg md:text-xl max-w-2xl mx-auto transition-colors duration-200 ${
             theme === "dark" ? "text-slate-300" : "text-gray-600"
           }`}
         >
@@ -216,7 +216,7 @@ export default function EstatisticasPage() {
       )}
 
       {/* Resumo Geral */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 px-4 md:px-0">
         <Card
           className={`text-center transition-colors duration-200 ${
             theme === "dark" ? "bg-slate-800 border-slate-700" : "bg-white"
@@ -619,7 +619,7 @@ export default function EstatisticasPage() {
         <CardContent>
           {dailySales.length > 0 ? (
             <>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 px-4">
                 {/* Gráfico de Barras */}
                 <div className="space-y-4">
                   <h3 className={`text-lg font-semibold text-center transition-colors duration-200 ${
@@ -838,7 +838,7 @@ export default function EstatisticasPage() {
       {/* Tabela de Vendas Diárias */}
       {dailySales.length > 0 && (
         <Card
-          className={`transition-colors duration-200 ${
+          className={`transition-colors duration-200 mx-4 ${
             theme === "dark" ? "bg-slate-800 border-slate-700" : "bg-white"
           }`}
         >

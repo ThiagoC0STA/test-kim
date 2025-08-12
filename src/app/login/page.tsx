@@ -72,20 +72,20 @@ export default function LoginPage() {
         ? 'bg-slate-900' 
         : 'bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100'
     }`}>
-      <div className="w-full max-w-md space-y-8">
+      <div className="w-full max-w-sm sm:max-w-md space-y-6 sm:space-y-8 px-4">
         {/* Header */}
         <div className="text-center space-y-2">
-          <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="mx-auto w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
+            <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
           </div>
-          <h1 className={`text-3xl font-bold tracking-tight transition-colors duration-200 ${
+          <h1 className={`text-2xl sm:text-3xl font-bold tracking-tight transition-colors duration-200 ${
             theme === 'dark' ? 'text-white' : 'text-gray-900'
           }`}>
             Toy Store Admin
           </h1>
-          <p className={`transition-colors duration-200 ${
+          <p className={`text-sm sm:text-base transition-colors duration-200 ${
             theme === 'dark' ? 'text-slate-300' : 'text-gray-600'
           }`}>
             {isSignUp ? 'Crie sua conta para começar' : 'Entre na sua conta'}
@@ -99,12 +99,12 @@ export default function LoginPage() {
             : 'bg-white/80'
         }`}>
           <CardHeader className="space-y-1 pb-4">
-            <CardTitle className={`text-2xl text-center transition-colors duration-200 ${
+            <CardTitle className={`text-xl sm:text-2xl text-center transition-colors duration-200 ${
               theme === 'dark' ? 'text-white' : 'text-gray-900'
             }`}>
               {isSignUp ? 'Criar Conta' : 'Entrar'}
             </CardTitle>
-            <CardDescription className={`text-center transition-colors duration-200 ${
+            <CardDescription className={`text-center text-xs sm:text-sm transition-colors duration-200 ${
               theme === 'dark' ? 'text-slate-300' : 'text-gray-600'
             }`}>
               {isSignUp 
@@ -122,7 +122,7 @@ export default function LoginPage() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className={theme === 'dark' ? 'text-slate-200' : ''}>
+                      <FormLabel className={`text-xs sm:text-sm font-medium ${theme === 'dark' ? 'text-slate-200' : 'text-gray-700'}`}>
                         E-mail
                       </FormLabel>
                       <FormControl>
@@ -130,7 +130,7 @@ export default function LoginPage() {
                           {...field}
                           type="email"
                           placeholder="seu@email.com"
-                          className="h-11"
+                          className="h-10 sm:h-11 text-sm sm:text-base"
                         />
                       </FormControl>
                       <FormMessage />
@@ -143,7 +143,7 @@ export default function LoginPage() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className={theme === 'dark' ? 'text-slate-200' : ''}>
+                      <FormLabel className={`text-xs sm:text-sm font-medium ${theme === 'dark' ? 'text-slate-200' : 'text-gray-700'}`}>
                         Senha
                       </FormLabel>
                       <FormControl>
@@ -151,7 +151,7 @@ export default function LoginPage() {
                           {...field}
                           type="password"
                           placeholder="••••••••"
-                          className="h-11"
+                          className="h-10 sm:h-11 text-sm sm:text-base"
                         />
                       </FormControl>
                       <FormMessage />
@@ -176,12 +176,12 @@ export default function LoginPage() {
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full h-11 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200"
+                  className="w-full h-10 sm:h-11 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200 text-sm sm:text-base"
                 >
                   {isLoading ? (
                     <div className="flex items-center space-x-2">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>{isSignUp ? 'Criando conta...' : 'Entrando...'}</span>
+                      <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span className="text-sm sm:text-base">{isSignUp ? 'Criando conta...' : 'Entrando...'}</span>
                     </div>
                   ) : (
                     isSignUp ? 'Criar Conta' : 'Entrar'

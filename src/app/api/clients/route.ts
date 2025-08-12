@@ -155,6 +155,21 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
+    // Validar se o ID é um UUID válido
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(id)) {
+      return NextResponse.json(
+        {
+          message: "ID do cliente inválido",
+          error: "Formato de UUID inválido",
+        },
+        { status: 400 }
+      );
+    }
+
+    console.log("Tentando atualizar cliente com ID:", id);
+
     // Preparar dados para atualização
     const updateData: any = {};
     if (updates.name) updateData.name = updates.name;
@@ -170,6 +185,7 @@ export async function PATCH(req: NextRequest) {
       .single();
 
     if (error) {
+      console.error("Erro do Supabase:", error);
       return NextResponse.json(
         { message: "Erro ao atualizar cliente", error: error.message },
         { status: 500 }
@@ -190,6 +206,7 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
+    console.error("Erro interno:", error);
     return NextResponse.json(
       { message: "Erro interno do servidor" },
       { status: 500 }
@@ -212,10 +229,26 @@ export async function DELETE(req: NextRequest) {
       );
     }
 
+    // Validar se o ID é um UUID válido
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(id)) {
+      return NextResponse.json(
+        {
+          message: "ID do cliente inválido",
+          error: "Formato de UUID inválido",
+        },
+        { status: 400 }
+      );
+    }
+
+    console.log("Tentando deletar cliente com ID:", id);
+
     // Deletar cliente
     const { error } = await supabase.from("clients").delete().eq("id", id);
 
     if (error) {
+      console.error("Erro do Supabase:", error);
       return NextResponse.json(
         { message: "Erro ao deletar cliente", error: error.message },
         { status: 500 }
@@ -224,6 +257,7 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json({ message: "Cliente deletado com sucesso" });
   } catch (error: any) {
+    console.error("Erro interno:", error);
     return NextResponse.json(
       { message: "Erro interno do servidor" },
       { status: 500 }
