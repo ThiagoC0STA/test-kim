@@ -1,4 +1,4 @@
-import { requireAuth } from "@/app/api/middleware";
+import { requireAuth } from "@/lib/middleware";
 import { supabase } from "@/lib/supabase";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
@@ -13,7 +13,7 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const auth = requireAuth(req);
+  const auth = await requireAuth(req);
   if (!auth.ok) return auth.response!;
   try {
     const json = await req.json();
@@ -51,7 +51,7 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const auth = requireAuth(req);
+  const auth = await requireAuth(req);
   if (!auth.ok) return auth.response!;
   const { error } = await supabase.from("clients").delete().eq("id", params.id);
   if (error)

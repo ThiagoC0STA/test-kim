@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useApi } from '@/hooks/useApi';
+import { useTheme } from '@/contexts/ThemeContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 
 // Interfaces
@@ -31,6 +31,7 @@ interface HighlightsResponse {
 
 export default function EstatisticasPage() {
   const { get } = useApi();
+  const { theme } = useTheme();
   const [dailySales, setDailySales] = useState<DailySale[]>([]);
   const [highlights, setHighlights] = useState<HighlightsResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -95,7 +96,11 @@ export default function EstatisticasPage() {
       <div className="flex items-center justify-center py-12">
         <div className="text-center space-y-4">
           <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="text-lg text-gray-600">Carregando estatísticas...</p>
+          <p className={`text-lg transition-colors duration-200 ${
+            theme === 'dark' ? 'text-slate-600' : 'text-gray-600'
+          }`}>
+            Carregando estatísticas...
+          </p>
         </div>
       </div>
     );
@@ -105,17 +110,31 @@ export default function EstatisticasPage() {
     <div className="space-y-8">
       {/* Header */}
       <div className="text-center space-y-4">
-        <h2 className="text-3xl font-bold tracking-tight text-gray-900">Estatísticas da Loja</h2>
-        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+        <h2 className={`text-3xl font-bold tracking-tight transition-colors duration-200 ${
+          theme === 'dark' ? 'text-slate-800' : 'text-gray-900'
+        }`}>
+          Estatísticas da Loja
+        </h2>
+        <p className={`text-xl max-w-2xl mx-auto transition-colors duration-200 ${
+          theme === 'dark' ? 'text-slate-600' : 'text-gray-600'
+        }`}>
           Acompanhe o desempenho e visualize métricas importantes da sua loja de brinquedos
         </p>
       </div>
 
       {/* Erro */}
       {error && (
-        <Card className="border-red-200 bg-red-50">
+        <Card className={`transition-colors duration-200 ${
+          theme === 'dark'
+            ? 'border-red-200 bg-red-50' 
+            : 'border-red-200 bg-red-50'
+        }`}>
           <CardContent className="pt-6">
-            <p className="text-red-700 font-medium">{error}</p>
+            <p className={`font-medium transition-colors duration-200 ${
+              theme === 'dark' ? 'text-red-700' : 'text-red-700'
+            }`}>
+              {error}
+            </p>
             <Button
               variant="outline"
               className="mt-3"
@@ -129,45 +148,73 @@ export default function EstatisticasPage() {
 
       {/* Resumo Geral */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card className="text-center">
+        <Card className={`text-center transition-colors duration-200 ${
+          theme === 'dark' ? 'bg-white/90 border-slate-200/50' : 'bg-white'
+        }`}>
           <CardContent className="pt-6">
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+            <div className={`w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-3 transition-colors duration-200 ${
+              theme === 'dark' ? 'bg-blue-100' : 'bg-blue-100'
+            }`}>
               <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </div>
             <div className="text-2xl font-bold text-blue-600">{totalDays}</div>
-            <div className="text-sm text-gray-600">Dias com Vendas</div>
+            <div className={`text-sm transition-colors duration-200 ${
+              theme === 'dark' ? 'text-slate-600' : 'text-gray-600'
+            }`}>
+              Dias com Vendas
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="text-center">
+        <Card className={`text-center transition-colors duration-200 ${
+          theme === 'dark' ? 'bg-white/90 border-slate-200/50' : 'bg-white'
+        }`}>
           <CardContent className="pt-6">
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+            <div className={`w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-3 transition-colors duration-200 ${
+              theme === 'dark' ? 'bg-green-100' : 'bg-green-100'
+            }`}>
               <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
               </svg>
             </div>
             <div className="text-2xl font-bold text-green-600">{formatCurrency(totalSales)}</div>
-            <div className="text-sm text-gray-600">Total Vendido</div>
+            <div className={`text-sm transition-colors duration-200 ${
+              theme === 'dark' ? 'text-slate-600' : 'text-gray-600'
+            }`}>
+              Total Vendido
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="text-center">
+        <Card className={`text-center transition-colors duration-200 ${
+          theme === 'dark' ? 'bg-white/90 border-slate-200/50' : 'bg-white'
+        }`}>
           <CardContent className="pt-6">
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+            <div className={`w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-3 transition-colors duration-200 ${
+              theme === 'dark' ? 'bg-purple-100' : 'bg-purple-100'
+            }`}>
               <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
             </div>
             <div className="text-2xl font-bold text-purple-600">{formatCurrency(avgDailySales)}</div>
-            <div className="text-sm text-gray-600">Média Diária</div>
+            <div className={`text-sm transition-colors duration-200 ${
+              theme === 'dark' ? 'text-slate-600' : 'text-gray-600'
+            }`}>
+              Média Diária
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="text-center">
+        <Card className={`text-center transition-colors duration-200 ${
+          theme === 'dark' ? 'bg-white/90 border-slate-200/50' : 'bg-white'
+        }`}>
           <CardContent className="pt-6">
-            <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+            <div className={`w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-3 transition-colors duration-200 ${
+              theme === 'dark' ? 'bg-orange-100' : 'bg-orange-100'
+            }`}>
               <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
@@ -175,7 +222,11 @@ export default function EstatisticasPage() {
             <div className="text-2xl font-bold text-orange-600">
               {highlights?.topVolume ? 1 : 0}
             </div>
-            <div className="text-sm text-gray-600">Clientes Destaque</div>
+            <div className={`text-sm transition-colors duration-200 ${
+              theme === 'dark' ? 'text-slate-600' : 'text-gray-600'
+            }`}>
+              Clientes Destaque
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -184,29 +235,47 @@ export default function EstatisticasPage() {
       {highlights && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Maior Volume */}
-          <Card className="border-l-4 border-l-blue-500">
+          <Card className={`border-l-4 border-l-blue-500 transition-colors duration-200 ${
+            theme === 'dark' ? 'bg-white/90 border-slate-200/50' : 'bg-white'
+          }`}>
             <CardHeader className="pb-3">
               <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ${
+                  theme === 'dark' ? 'bg-blue-100' : 'bg-blue-100'
+                }`}>
                   <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                   </svg>
                 </div>
-                <CardTitle className="text-lg">Maior Volume</CardTitle>
+                <CardTitle className={`text-lg transition-colors duration-200 ${
+                  theme === 'dark' ? 'text-slate-800' : 'text-gray-900'
+                }`}>
+                  Maior Volume
+                </CardTitle>
               </div>
-              <CardDescription>Cliente com maior volume de vendas</CardDescription>
+              <CardDescription className={theme === 'dark' ? 'text-slate-600' : ''}>
+                Cliente com maior volume de vendas
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {highlights.topVolume ? (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-900">{highlights.topVolume.name}</span>
+                    <span className={`text-sm font-medium transition-colors duration-200 ${
+                      theme === 'dark' ? 'text-slate-800' : 'text-gray-900'
+                    }`}>
+                      {highlights.topVolume.name}
+                    </span>
                     <Badge variant="secondary">{highlights.topVolume.email}</Badge>
                   </div>
                   <div className="text-2xl font-bold text-blue-600">
                     {formatCurrency(highlights.topVolume.total_value || 0)}
                   </div>
-                  <p className="text-xs text-gray-500">Total em vendas</p>
+                  <p className={`text-xs transition-colors duration-200 ${
+                    theme === 'dark' ? 'text-slate-500' : 'text-gray-500'
+                  }`}>
+                    Total em vendas
+                  </p>
                 </div>
               ) : (
                 <div className="text-center py-4 text-gray-500">
@@ -217,29 +286,47 @@ export default function EstatisticasPage() {
           </Card>
 
           {/* Maior Média */}
-          <Card className="border-l-4 border-l-green-500">
+          <Card className={`border-l-4 border-l-green-500 transition-colors duration-200 ${
+            theme === 'dark' ? 'bg-white/90 border-slate-200/50' : 'bg-white'
+          }`}>
             <CardHeader className="pb-3">
               <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ${
+                  theme === 'dark' ? 'bg-green-100' : 'bg-green-100'
+                }`}>
                   <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <CardTitle className="text-lg">Maior Média</CardTitle>
+                <CardTitle className={`text-lg transition-colors duration-200 ${
+                  theme === 'dark' ? 'text-slate-800' : 'text-gray-900'
+                }`}>
+                  Maior Média
+                </CardTitle>
               </div>
-              <CardDescription>Cliente com maior ticket médio</CardDescription>
+              <CardDescription className={theme === 'dark' ? 'text-slate-600' : ''}>
+                Cliente com maior ticket médio
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {highlights.topAverage ? (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-900">{highlights.topAverage.name}</span>
+                    <span className={`text-sm font-medium transition-colors duration-200 ${
+                      theme === 'dark' ? 'text-slate-800' : 'text-gray-900'
+                    }`}>
+                      {highlights.topAverage.name}
+                    </span>
                     <Badge variant="secondary">{highlights.topAverage.email}</Badge>
                   </div>
                   <div className="text-2xl font-bold text-green-600">
                     {formatCurrency(highlights.topAverage.avg_value || 0)}
                   </div>
-                  <p className="text-xs text-gray-500">Ticket médio por venda</p>
+                  <p className={`text-xs transition-colors duration-200 ${
+                    theme === 'dark' ? 'text-slate-500' : 'text-gray-500'
+                  }`}>
+                    Ticket médio por venda
+                  </p>
                 </div>
               ) : (
                 <div className="text-center py-4 text-gray-500">
@@ -250,29 +337,47 @@ export default function EstatisticasPage() {
           </Card>
 
           {/* Maior Frequência */}
-          <Card className="border-l-4 border-l-purple-500">
+          <Card className={`border-l-4 border-l-purple-500 transition-colors duration-200 ${
+            theme === 'dark' ? 'bg-white/90 border-slate-200/50' : 'bg-white'
+          }`}>
             <CardHeader className="pb-3">
               <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ${
+                  theme === 'dark' ? 'bg-purple-100' : 'bg-purple-100'
+                }`}>
                   <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <CardTitle className="text-lg">Maior Frequência</CardTitle>
+                <CardTitle className={`text-lg transition-colors duration-200 ${
+                  theme === 'dark' ? 'text-slate-800' : 'text-gray-900'
+                }`}>
+                  Maior Frequência
+                </CardTitle>
               </div>
-              <CardDescription>Cliente com mais dias de compra</CardDescription>
+              <CardDescription className={theme === 'dark' ? 'text-slate-600' : ''}>
+                Cliente com mais dias de compra
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {highlights.topFrequency ? (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-900">{highlights.topFrequency.name}</span>
+                    <span className={`text-sm font-medium transition-colors duration-200 ${
+                      theme === 'dark' ? 'text-slate-800' : 'text-gray-900'
+                    }`}>
+                      {highlights.topFrequency.name}
+                    </span>
                     <Badge variant="secondary">{highlights.topFrequency.email}</Badge>
                   </div>
                   <div className="text-2xl font-bold text-purple-600">
                     {highlights.topFrequency.unique_days || 0}
                   </div>
-                  <p className="text-xs text-gray-500">Dias únicos com compras</p>
+                  <p className={`text-xs transition-colors duration-200 ${
+                    theme === 'dark' ? 'text-slate-500' : 'text-gray-500'
+                  }`}>
+                    Dias únicos com compras
+                  </p>
                 </div>
               ) : (
                 <div className="text-center py-4 text-gray-500">
@@ -285,10 +390,12 @@ export default function EstatisticasPage() {
       )}
 
       {/* Gráfico de Vendas Diárias */}
-      <Card>
+      <Card className={theme === 'dark' ? 'bg-white/90 border-slate-200/50' : ''}>
         <CardHeader>
-          <CardTitle>Vendas por Dia</CardTitle>
-          <CardDescription>
+          <CardTitle className={theme === 'dark' ? 'text-slate-800' : ''}>
+            Vendas por Dia
+          </CardTitle>
+          <CardDescription className={theme === 'dark' ? 'text-slate-600' : ''}>
             Evolução das vendas ao longo do tempo
           </CardDescription>
         </CardHeader>
@@ -299,26 +406,27 @@ export default function EstatisticasPage() {
               <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#e2e8f0' : '#f0f0f0'} />
                     <XAxis 
                       dataKey="formattedDate" 
                       angle={-45}
                       textAnchor="end"
                       height={80}
-                      tick={{ fontSize: 12 }}
+                      tick={{ fontSize: 12, fill: theme === 'dark' ? '#64748b' : '#374151' }}
                     />
                     <YAxis 
                       tickFormatter={(value) => `R$ ${value}`}
-                      tick={{ fontSize: 12 }}
+                      tick={{ fontSize: 12, fill: theme === 'dark' ? '#64748b' : '#374151' }}
                     />
                     <Tooltip 
                       formatter={(value: number) => [formatCurrency(value), 'Valor']}
                       labelFormatter={(label) => `Data: ${label}`}
                       contentStyle={{
-                        backgroundColor: 'white',
-                        border: '1px solid #e5e7eb',
+                        backgroundColor: theme === 'dark' ? 'white' : 'white',
+                        border: theme === 'dark' ? '1px solid #e2e8f0' : '1px solid #e5e7eb',
                         borderRadius: '8px',
-                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                        color: theme === 'dark' ? '#1e293b' : '#111827'
                       }}
                     />
                     <Bar 
@@ -344,26 +452,27 @@ export default function EstatisticasPage() {
               <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#e2e8f0' : '#f0f0f0'} />
                     <XAxis 
                       dataKey="formattedDate" 
                       angle={-45}
                       textAnchor="end"
                       height={80}
-                      tick={{ fontSize: 12 }}
+                      tick={{ fontSize: 12, fill: theme === 'dark' ? '#64748b' : '#374151' }}
                     />
                     <YAxis 
                       tickFormatter={(value) => `R$ ${value}`}
-                      tick={{ fontSize: 12 }}
+                      tick={{ fontSize: 12, fill: theme === 'dark' ? '#64748b' : '#374151' }}
                     />
                     <Tooltip 
                       formatter={(value: number) => [formatCurrency(value), 'Valor']}
                       labelFormatter={(label) => `Data: ${label}`}
                       contentStyle={{
-                        backgroundColor: 'white',
-                        border: '1px solid #e5e7eb',
+                        backgroundColor: theme === 'dark' ? 'white' : 'white',
+                        border: theme === 'dark' ? '1px solid #e2e8f0' : '1px solid #e5e7eb',
                         borderRadius: '8px',
-                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                        color: theme === 'dark' ? '#1e293b' : '#111827'
                       }}
                     />
                     <Line 
@@ -392,10 +501,12 @@ export default function EstatisticasPage() {
 
       {/* Tabela de Vendas Diárias */}
       {dailySales.length > 0 && (
-        <Card>
+        <Card className={theme === 'dark' ? 'bg-white/90 border-slate-200/50' : ''}>
           <CardHeader>
-            <CardTitle>Detalhamento por Dia</CardTitle>
-            <CardDescription>
+            <CardTitle className={theme === 'dark' ? 'text-slate-800' : ''}>
+              Detalhamento por Dia
+            </CardTitle>
+            <CardDescription className={theme === 'dark' ? 'text-slate-600' : ''}>
               Lista completa de vendas organizadas por data
             </CardDescription>
           </CardHeader>
@@ -403,30 +514,70 @@ export default function EstatisticasPage() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b">
-                    <th className="text-left py-3 px-4 font-medium text-gray-700">Data</th>
-                    <th className="text-right py-3 px-4 font-medium text-gray-700">Total Vendido</th>
-                    <th className="text-right py-3 px-4 font-medium text-gray-700">% do Total</th>
+                  <tr className={`border-b transition-colors duration-200 ${
+                    theme === 'dark' ? 'border-slate-200' : 'border-gray-200'
+                  }`}>
+                    <th className={`text-left py-3 px-4 font-medium transition-colors duration-200 ${
+                      theme === 'dark' ? 'text-slate-700' : 'text-gray-700'
+                    }`}>
+                      Data
+                    </th>
+                    <th className={`text-right py-3 px-4 font-medium transition-colors duration-200 ${
+                      theme === 'dark' ? 'text-slate-700' : 'text-gray-700'
+                    }`}>
+                      Total Vendido
+                    </th>
+                    <th className={`text-right py-3 px-4 font-medium transition-colors duration-200 ${
+                      theme === 'dark' ? 'text-slate-700' : 'text-gray-700'
+                    }`}>
+                      % do Total
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {dailySales.map((sale, index) => (
-                    <tr key={sale.date} className="border-b hover:bg-gray-50">
-                      <td className="py-3 px-4 text-gray-900">{formatDate(sale.date)}</td>
-                      <td className="py-3 px-4 text-right font-medium text-gray-900">
+                    <tr key={sale.date} className={`border-b transition-colors duration-200 ${
+                      theme === 'dark' 
+                        ? 'border-slate-200 hover:bg-slate-50' 
+                        : 'border-gray-200 hover:bg-gray-50'
+                    }`}>
+                      <td className={`py-3 px-4 transition-colors duration-200 ${
+                        theme === 'dark' ? 'text-slate-800' : 'text-gray-900'
+                      }`}>
+                        {formatDate(sale.date)}
+                      </td>
+                      <td className={`py-3 px-4 text-right font-medium transition-colors duration-200 ${
+                        theme === 'dark' ? 'text-slate-800' : 'text-gray-900'
+                      }`}>
                         {formatCurrency(sale.total)}
                       </td>
-                      <td className="py-3 px-4 text-right text-gray-500">
+                      <td className={`py-3 px-4 text-right transition-colors duration-200 ${
+                        theme === 'dark' ? 'text-slate-500' : 'text-gray-500'
+                      }`}>
                         {totalSales > 0 ? ((sale.total / totalSales) * 100).toFixed(1) : 0}%
                       </td>
                     </tr>
                   ))}
                 </tbody>
                 <tfoot>
-                  <tr className="bg-gray-50 font-medium">
-                    <td className="py-3 px-4 text-gray-900">Total Geral</td>
-                    <td className="py-3 px-4 text-right text-gray-900">{formatCurrency(totalSales)}</td>
-                    <td className="py-3 px-4 text-right text-gray-900">100%</td>
+                  <tr className={`font-medium transition-colors duration-200 ${
+                    theme === 'dark' ? 'bg-slate-50' : 'bg-gray-50'
+                  }`}>
+                    <td className={`py-3 px-4 transition-colors duration-200 ${
+                      theme === 'dark' ? 'text-slate-800' : 'text-gray-900'
+                    }`}>
+                      Total Geral
+                    </td>
+                    <td className={`py-3 px-4 text-right transition-colors duration-200 ${
+                      theme === 'dark' ? 'text-slate-800' : 'text-gray-900'
+                    }`}>
+                      {formatCurrency(totalSales)}
+                    </td>
+                    <td className={`py-3 px-4 text-right transition-colors duration-200 ${
+                      theme === 'dark' ? 'text-slate-800' : 'text-gray-900'
+                    }`}>
+                      100%
+                    </td>
                   </tr>
                 </tfoot>
               </table>
@@ -440,7 +591,11 @@ export default function EstatisticasPage() {
         <Button 
           onClick={loadData}
           variant="outline"
-          className="bg-white hover:bg-gray-50"
+          className={`transition-colors duration-200 ${
+            theme === 'dark' 
+              ? 'bg-white hover:bg-slate-50 border-slate-200' 
+              : 'bg-white hover:bg-gray-50'
+          }`}
         >
           <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />

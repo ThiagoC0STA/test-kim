@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useApi } from '@/hooks/useApi';
 import { firstMissingAlphabetLetter } from '@/lib/utils';
+import { useTheme } from '@/contexts/ThemeContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,7 +15,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 
 // Schemas de validação
 const CreateClientSchema = z.object({
@@ -64,6 +64,7 @@ interface Client {
 
 export default function ClientesPage() {
   const { get, post, patch, delete: del } = useApi();
+  const { theme } = useTheme();
   const [clients, setClients] = useState<Client[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -197,8 +198,14 @@ export default function ClientesPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900">Gerenciar Clientes</h2>
-          <p className="text-gray-600 mt-2">
+          <h2 className={`text-3xl font-bold tracking-tight transition-colors duration-200 ${
+            theme === 'dark' ? 'text-slate-800' : 'text-gray-900'
+          }`}>
+            Gerenciar Clientes
+          </h2>
+          <p className={`mt-2 transition-colors duration-200 ${
+            theme === 'dark' ? 'text-slate-600' : 'text-gray-600'
+          }`}>
             Cadastre, edite e gerencie todos os clientes da loja
           </p>
         </div>
@@ -225,7 +232,9 @@ export default function ClientesPage() {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Nome Completo</FormLabel>
+                      <FormLabel className={theme === 'dark' ? 'text-slate-700' : ''}>
+                        Nome Completo
+                      </FormLabel>
                       <FormControl>
                         <Input {...field} placeholder="Nome do cliente" />
                       </FormControl>
@@ -238,7 +247,9 @@ export default function ClientesPage() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>E-mail</FormLabel>
+                      <FormLabel className={theme === 'dark' ? 'text-slate-700' : ''}>
+                        E-mail
+                      </FormLabel>
                       <FormControl>
                         <Input {...field} type="email" placeholder="cliente@email.com" />
                       </FormControl>
@@ -251,7 +262,9 @@ export default function ClientesPage() {
                   name="birthDate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Data de Nascimento</FormLabel>
+                      <FormLabel className={theme === 'dark' ? 'text-slate-700' : ''}>
+                        Data de Nascimento
+                      </FormLabel>
                       <FormControl>
                         <Input {...field} type="date" />
                       </FormControl>
@@ -276,17 +289,21 @@ export default function ClientesPage() {
       </div>
 
       {/* Filtros */}
-      <Card>
+      <Card className={theme === 'dark' ? 'bg-white/90 border-slate-200/50' : ''}>
         <CardHeader>
-          <CardTitle>Filtros</CardTitle>
-          <CardDescription>
+          <CardTitle className={theme === 'dark' ? 'text-slate-800' : ''}>
+            Filtros
+          </CardTitle>
+          <CardDescription className={theme === 'dark' ? 'text-slate-600' : ''}>
             Filtre os clientes por nome ou e-mail
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="name-filter">Nome</Label>
+              <Label htmlFor="name-filter" className={theme === 'dark' ? 'text-slate-700' : ''}>
+                Nome
+              </Label>
               <Input
                 id="name-filter"
                 placeholder="Filtrar por nome..."
@@ -295,7 +312,9 @@ export default function ClientesPage() {
               />
             </div>
             <div>
-              <Label htmlFor="email-filter">E-mail</Label>
+              <Label htmlFor="email-filter" className={theme === 'dark' ? 'text-slate-700' : ''}>
+                E-mail
+              </Label>
               <Input
                 id="email-filter"
                 placeholder="Filtrar por e-mail..."
@@ -309,18 +328,28 @@ export default function ClientesPage() {
 
       {/* Erro */}
       {error && (
-        <Card className="border-red-200 bg-red-50">
+        <Card className={`transition-colors duration-200 ${
+          theme === 'dark'
+            ? 'border-red-200 bg-red-50' 
+            : 'border-red-200 bg-red-50'
+        }`}>
           <CardContent className="pt-6">
-            <p className="text-red-700 font-medium">{error}</p>
+            <p className={`font-medium transition-colors duration-200 ${
+              theme === 'dark' ? 'text-red-700' : 'text-red-700'
+            }`}>
+              {error}
+            </p>
           </CardContent>
         </Card>
       )}
 
       {/* Tabela de Clientes */}
-      <Card>
+      <Card className={theme === 'dark' ? 'bg-white/90 border-slate-200/50' : ''}>
         <CardHeader>
-          <CardTitle>Clientes ({clients.length})</CardTitle>
-          <CardDescription>
+          <CardTitle className={theme === 'dark' ? 'text-slate-800' : ''}>
+            Clientes ({clients.length})
+          </CardTitle>
+          <CardDescription className={theme === 'dark' ? 'text-slate-600' : ''}>
             Lista completa de clientes cadastrados
           </CardDescription>
         </CardHeader>
@@ -328,29 +357,41 @@ export default function ClientesPage() {
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
               <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-              <span className="ml-2 text-gray-600">Carregando clientes...</span>
+              <span className={`ml-2 transition-colors duration-200 ${
+                theme === 'dark' ? 'text-slate-600' : 'text-gray-600'
+              }`}>
+                Carregando clientes...
+              </span>
             </div>
           ) : clients.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
+            <div className={`text-center py-8 transition-colors duration-200 ${
+              theme === 'dark' ? 'text-slate-500' : 'text-gray-500'
+            }`}>
               Nenhum cliente encontrado
             </div>
           ) : (
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>Nome</TableHead>
-                  <TableHead>E-mail</TableHead>
-                  <TableHead>Data de Nascimento</TableHead>
-                  <TableHead>Letra Ausente</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
+                <TableRow className={theme === 'dark' ? 'border-slate-200' : ''}>
+                  <TableHead className={theme === 'dark' ? 'text-slate-700' : ''}>Nome</TableHead>
+                  <TableHead className={theme === 'dark' ? 'text-slate-700' : ''}>E-mail</TableHead>
+                  <TableHead className={theme === 'dark' ? 'text-slate-700' : ''}>Data de Nascimento</TableHead>
+                  <TableHead className={theme === 'dark' ? 'text-slate-700' : ''}>Letra Ausente</TableHead>
+                  <TableHead className={`text-right ${theme === 'dark' ? 'text-slate-700' : ''}`}>Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {clients.map((client) => (
-                  <TableRow key={client.id}>
-                    <TableCell className="font-medium">{client.name}</TableCell>
-                    <TableCell>{client.email}</TableCell>
-                    <TableCell>
+                  <TableRow key={client.id} className={theme === 'dark' ? 'border-slate-200' : ''}>
+                    <TableCell className={`font-medium transition-colors duration-200 ${
+                      theme === 'dark' ? 'text-slate-800' : ''
+                    }`}>
+                      {client.name}
+                    </TableCell>
+                    <TableCell className={theme === 'dark' ? 'text-slate-600' : ''}>
+                      {client.email}
+                    </TableCell>
+                    <TableCell className={theme === 'dark' ? 'text-slate-600' : ''}>
                       {new Date(client.birthDate).toLocaleDateString('pt-BR')}
                     </TableCell>
                     <TableCell>
@@ -400,7 +441,9 @@ export default function ClientesPage() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nome Completo</FormLabel>
+                    <FormLabel className={theme === 'dark' ? 'text-slate-700' : ''}>
+                      Nome Completo
+                    </FormLabel>
                     <FormControl>
                       <Input {...field} placeholder="Nome do cliente" />
                     </FormControl>
@@ -413,7 +456,9 @@ export default function ClientesPage() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>E-mail</FormLabel>
+                    <FormLabel className={theme === 'dark' ? 'text-slate-700' : ''}>
+                      E-mail
+                    </FormLabel>
                     <FormControl>
                       <Input {...field} type="email" placeholder="cliente@email.com" />
                     </FormControl>
@@ -426,7 +471,9 @@ export default function ClientesPage() {
                 name="birthDate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Data de Nascimento</FormLabel>
+                    <FormLabel className={theme === 'dark' ? 'text-slate-700' : ''}>
+                      Data de Nascimento
+                    </FormLabel>
                     <FormControl>
                       <Input {...field} type="date" />
                     </FormControl>

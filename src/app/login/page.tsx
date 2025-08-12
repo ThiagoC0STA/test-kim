@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -23,6 +24,7 @@ type AuthForm = z.infer<typeof AuthSchema>;
 export default function LoginPage() {
   const router = useRouter();
   const { signIn, signUp } = useAuth();
+  const { theme } = useTheme();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSignUp, setIsSignUp] = useState(false);
@@ -64,7 +66,11 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className={`min-h-screen flex items-center justify-center p-4 transition-colors duration-200 ${
+      theme === 'dark' 
+        ? 'bg-slate-900' 
+        : 'bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100'
+    }`}>
       <div className="w-full max-w-md space-y-8">
         {/* Header */}
         <div className="text-center space-y-2">
@@ -73,21 +79,33 @@ export default function LoginPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+          <h1 className={`text-3xl font-bold tracking-tight transition-colors duration-200 ${
+            theme === 'dark' ? 'text-white' : 'text-gray-900'
+          }`}>
             Toy Store Admin
           </h1>
-          <p className="text-gray-600">
+          <p className={`transition-colors duration-200 ${
+            theme === 'dark' ? 'text-slate-300' : 'text-gray-600'
+          }`}>
             {isSignUp ? 'Crie sua conta para começar' : 'Entre na sua conta'}
           </p>
         </div>
 
         {/* Auth Card */}
-        <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
+        <Card className={`shadow-xl border-0 backdrop-blur-sm transition-colors duration-200 ${
+          theme === 'dark' 
+            ? 'bg-slate-800 border-slate-700' 
+            : 'bg-white/80'
+        }`}>
           <CardHeader className="space-y-1 pb-4">
-            <CardTitle className="text-2xl text-center">
+            <CardTitle className={`text-2xl text-center transition-colors duration-200 ${
+              theme === 'dark' ? 'text-white' : 'text-gray-900'
+            }`}>
               {isSignUp ? 'Criar Conta' : 'Entrar'}
             </CardTitle>
-            <CardDescription className="text-center">
+            <CardDescription className={`text-center transition-colors duration-200 ${
+              theme === 'dark' ? 'text-slate-300' : 'text-gray-600'
+            }`}>
               {isSignUp 
                 ? 'Preencha os dados abaixo para criar sua conta' 
                 : 'Digite suas credenciais para acessar o sistema'
@@ -103,7 +121,9 @@ export default function LoginPage() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>E-mail</FormLabel>
+                      <FormLabel className={theme === 'dark' ? 'text-slate-200' : ''}>
+                        E-mail
+                      </FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -122,7 +142,9 @@ export default function LoginPage() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Senha</FormLabel>
+                      <FormLabel className={theme === 'dark' ? 'text-slate-200' : ''}>
+                        Senha
+                      </FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -137,10 +159,14 @@ export default function LoginPage() {
                 />
 
                 {error && (
-                  <div className={`p-3 rounded-lg border ${
+                  <div className={`p-3 rounded-lg border transition-colors duration-200 ${
                     error.includes('Verifique seu e-mail') 
-                      ? 'bg-green-50 border-green-200 text-green-700' 
-                      : 'bg-red-50 border-red-200 text-red-700'
+                      ? theme === 'dark'
+                        ? 'bg-green-900/20 border-green-700 text-green-300'
+                        : 'bg-green-50 border-green-200 text-green-700'
+                      : theme === 'dark'
+                        ? 'bg-red-900/20 border-red-700 text-red-300'
+                        : 'bg-red-50 border-red-200 text-red-700'
                   }`}>
                     <p className="text-sm font-medium">{error}</p>
                   </div>
@@ -164,9 +190,17 @@ export default function LoginPage() {
             </Form>
 
             <div className="relative">
-              <Separator className="my-4" />
+              <Separator className={`my-4 ${
+                theme === 'dark' ? 'bg-slate-600' : 'bg-gray-200'
+              }`} />
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="bg-white px-4 text-sm text-gray-500">ou</span>
+                <span className={`px-4 text-sm transition-colors duration-200 ${
+                  theme === 'dark' 
+                    ? 'bg-slate-800 text-slate-400' 
+                    : 'bg-white text-gray-500'
+                }`}>
+                  ou
+                </span>
               </div>
             </div>
 
@@ -174,7 +208,11 @@ export default function LoginPage() {
               <Button
                 variant="ghost"
                 onClick={() => setIsSignUp(!isSignUp)}
-                className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                className={`transition-colors duration-200 ${
+                  theme === 'dark'
+                    ? 'text-blue-400 hover:text-blue-300 hover:bg-slate-700'
+                    : 'text-blue-600 hover:text-blue-700 hover:bg-blue-50'
+                }`}
               >
                 {isSignUp ? 'Já tem uma conta? Faça login' : 'Não tem uma conta? Registre-se'}
               </Button>
@@ -182,7 +220,9 @@ export default function LoginPage() {
 
             {!isSignUp && (
               <div className="text-center">
-                <p className="text-xs text-gray-500">
+                <p className={`text-xs transition-colors duration-200 ${
+                  theme === 'dark' ? 'text-slate-400' : 'text-gray-500'
+                }`}>
                   Para testar o sistema, crie uma conta primeiro
                 </p>
               </div>
@@ -192,7 +232,9 @@ export default function LoginPage() {
 
         {/* Footer */}
         <div className="text-center">
-          <p className="text-xs text-gray-500">
+          <p className={`text-xs transition-colors duration-200 ${
+            theme === 'dark' ? 'text-slate-400' : 'text-gray-500'
+          }`}>
             Sistema de administração para loja de brinquedos
           </p>
         </div>
