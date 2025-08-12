@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useApi } from '@/hooks/useApi';
-import { firstMissingAlphabetLetter } from '@/lib/utils';
+import { firstMissingAlphabetLetter, normalizeClients, type RawClientResponse } from '@/lib/utils';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,32 +31,7 @@ const UpdateClientSchema = CreateClientSchema.partial();
 type CreateClientForm = z.infer<typeof CreateClientSchema>;
 type UpdateClientForm = z.infer<typeof UpdateClientSchema>;
 
-// Interfaces
-interface RawClientResponse {
-  data: {
-    clientes: Array<{
-      id?: string; // ID real do Supabase
-      info?: {
-        nomeCompleto?: string;
-        detalhes?: {
-          email?: string;
-          nascimento?: string;
-        };
-      };
-      duplicado?: {
-        nomeCompleto?: string;
-      };
-      estatisticas?: {
-        vendas?: Array<{ data: string; valor: number }>;
-      };
-    }>;
-  };
-  meta?: {
-    registroTotal?: number;
-    pagina?: number;
-  };
-  redundante?: any;
-}
+
 
 interface Client {
   id: string;
@@ -89,26 +64,7 @@ export default function ClientesPage() {
     resolver: zodResolver(UpdateClientSchema),
   });
 
-  // Normalizar dados da API
-  const normalizeClients = (rawData: RawClientResponse): Client[] => {
-    return (rawData.data?.clientes || [])
-      .map((item) => {
-        const name = item.info?.nomeCompleto || item.duplicado?.nomeCompleto || '';
-        const email = item.info?.detalhes?.email || '';
-        const birthDate = item.info?.detalhes?.nascimento || '';
 
-        if (!name || !email) return null;
-
-        return {
-          id: item.id || Math.random().toString(36).substr(2, 9), // Usar ID real do Supabase se disponível
-          name,
-          email,
-          birthDate,
-          missingLetter: firstMissingAlphabetLetter(name),
-        };
-      })
-      .filter(Boolean) as Client[];
-  };
 
   // Carregar clientes
   const loadClients = async () => {
