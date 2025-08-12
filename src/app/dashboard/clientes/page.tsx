@@ -15,6 +15,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
+import { TableSkeleton } from '@/components/ui/table-skeleton';
+import { CardSkeleton } from '@/components/ui/card-skeleton';
+import { FormSkeleton } from '@/components/ui/form-skeleton';
 
 // Schemas de validação
 const CreateClientSchema = z.object({
@@ -282,10 +285,17 @@ export default function ClientesPage() {
                     variant="outline"
                     onClick={() => setIsCreateDialogOpen(false)}
                     className={theme === 'dark' ? 'border-slate-600 text-slate-200 hover:bg-slate-700' : ''}
+                    disabled={createForm.formState.isSubmitting}
                   >
                     Cancelar
                   </Button>
-                  <Button type="submit">Criar Cliente</Button>
+                  <Button 
+                    type="submit" 
+                    disabled={createForm.formState.isSubmitting}
+                    className={theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : ''}
+                  >
+                    {createForm.formState.isSubmitting ? 'Criando...' : 'Criar Cliente'}
+                  </Button>
                 </div>
               </form>
             </Form>
@@ -369,16 +379,9 @@ export default function ClientesPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {isLoading ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-              <span className={`ml-2 transition-colors duration-200 ${
-                theme === 'dark' ? 'text-slate-300' : 'text-gray-600'
-              }`}>
-                Carregando clientes...
-              </span>
-            </div>
-          ) : clients.length === 0 ? (
+                  {isLoading ? (
+          <TableSkeleton rows={8} columns={5} />
+        ) : clients.length === 0 ? (
             <div className={`text-center py-8 transition-colors duration-200 ${
               theme === 'dark' ? 'text-slate-400' : 'text-gray-500'
             }`}>
@@ -503,15 +506,22 @@ export default function ClientesPage() {
                   )}
                 />
               <div className="flex justify-end space-x-2 pt-4">
-                                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setIsEditDialogOpen(false)}
-                    className={theme === 'dark' ? 'border-slate-600 text-slate-200 hover:bg-slate-700' : ''}
-                  >
-                    Cancelar
-                  </Button>
-                <Button type="submit">Salvar Alterações</Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsEditDialogOpen(false)}
+                  className={theme === 'dark' ? 'border-slate-600 text-slate-200 hover:bg-slate-700' : ''}
+                  disabled={updateForm.formState.isSubmitting}
+                >
+                  Cancelar
+                </Button>
+                <Button 
+                  type="submit"
+                  disabled={updateForm.formState.isSubmitting}
+                  className={theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : ''}
+                >
+                  {updateForm.formState.isSubmitting ? 'Salvando...' : 'Salvar Alterações'}
+                </Button>
               </div>
             </form>
           </Form>

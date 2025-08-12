@@ -11,6 +11,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { CardSkeleton } from "@/components/ui/card-skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import {
   BarChart,
@@ -109,10 +111,53 @@ export default function EstatisticasPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-12">
+      <div className="space-y-8">
+        {/* Header Skeleton */}
         <div className="text-center space-y-4">
-          <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <Skeleton className="h-10 w-80 mx-auto" />
+          <Skeleton className="h-6 w-96 mx-auto" />
         </div>
+
+        {/* Cards de Resumo Skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <CardSkeleton key={index} showHeader={false} contentLines={2} />
+          ))}
+        </div>
+
+        {/* Gráficos Skeleton - Versão simplificada */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="space-y-4">
+            <Skeleton className="h-5 w-32 mx-auto" />
+            <div className="h-72 w-full bg-white dark:bg-slate-800 rounded-lg border dark:border-slate-700 p-4">
+              <div className="flex items-end justify-between h-full space-x-2">
+                {Array.from({ length: 7 }).map((_, index) => (
+                  <div key={index} className="flex-1 flex flex-col items-center space-y-2">
+                    <Skeleton className="w-full rounded-t" style={{ height: `${Math.random() * 60 + 20}%` }} />
+                    <Skeleton className="h-3 w-12" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          
+          <div className="space-y-4">
+            <Skeleton className="h-5 w-32 mx-auto" />
+            <div className="h-72 w-full bg-white dark:bg-slate-800 rounded-lg border dark:border-slate-700 p-4">
+              <div className="flex items-end justify-between h-full space-x-2">
+                {Array.from({ length: 7 }).map((_, index) => (
+                  <div key={index} className="flex-1 flex flex-col items-center space-y-2">
+                    <Skeleton className="w-full rounded-t" style={{ height: `${Math.random() * 60 + 20}%` }} />
+                    <Skeleton className="h-3 w-12" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Tabela Skeleton */}
+        <CardSkeleton showHeader={true} showDescription={true} contentLines={6} />
       </div>
     );
   }
@@ -573,59 +618,170 @@ export default function EstatisticasPage() {
         </CardHeader>
         <CardContent>
           {dailySales.length > 0 ? (
-            <div className="space-y-6">
-              {/* Gráfico de Barras */}
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={chartData}
-                    margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
-                  >
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      stroke={theme === "dark" ? "#e2e8f0" : "#f0f0f0"}
-                    />
-                    <XAxis
-                      dataKey="formattedDate"
-                      angle={-45}
-                      textAnchor="end"
-                      height={80}
-                      tick={{
-                        fontSize: 12,
-                        fill: theme === "dark" ? "#64748b" : "#374151",
-                      }}
-                    />
-                    <YAxis
-                      tickFormatter={(value) => `R$ ${value}`}
-                      tick={{
-                        fontSize: 12,
-                        fill: theme === "dark" ? "#64748b" : "#374151",
-                      }}
-                    />
-                    <Tooltip
-                      formatter={(value: number) => [
-                        formatCurrency(value),
-                        "Valor",
-                      ]}
-                      labelFormatter={(label) => `Data: ${label}`}
-                      contentStyle={{
-                        backgroundColor: theme === "dark" ? "white" : "white",
-                        border:
-                          theme === "dark"
-                            ? "1px solid #e2e8f0"
-                            : "1px solid #e5e7eb",
-                        borderRadius: "8px",
-                        boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-                        color: theme === "dark" ? "#1e293b" : "#111827",
-                      }}
-                    />
-                    <Bar
-                      dataKey="total"
-                      fill="url(#colorGradient)"
-                      radius={[4, 4, 0, 0]}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
+            <>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Gráfico de Barras */}
+                <div className="space-y-4">
+                  <h3 className={`text-lg font-semibold text-center transition-colors duration-200 ${
+                    theme === "dark" ? "text-slate-200" : "text-gray-700"
+                  }`}>
+                    Vendas por Dia (Barras)
+                  </h3>
+                  <div className="h-72">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={chartData}
+                        margin={{ top: 20, right: 20, left: 20, bottom: 60 }}
+                      >
+                        <CartesianGrid
+                          strokeDasharray="3 3"
+                          stroke={theme === "dark" ? "#475569" : "#e2e8f0"}
+                          opacity={0.3}
+                        />
+                        <XAxis
+                          dataKey="formattedDate"
+                          angle={-45}
+                          textAnchor="end"
+                          height={80}
+                          tick={{
+                            fontSize: 11,
+                            fill: theme === "dark" ? "#94a3b8" : "#64748b",
+                            fontWeight: 500,
+                          }}
+                          axisLine={{ 
+                            stroke: theme === "dark" ? "#475569" : "#cbd5e1",
+                            strokeWidth: 1 
+                          }}
+                        />
+                        <YAxis
+                          tickFormatter={(value) => `R$ ${value}`}
+                          tick={{
+                            fontSize: 11,
+                            fill: theme === "dark" ? "#94a3b8" : "#64748b",
+                            fontWeight: 500,
+                          }}
+                          axisLine={{ 
+                            stroke: theme === "dark" ? "#475569" : "#cbd5e1",
+                            strokeWidth: 1 
+                          }}
+                        />
+                        <Tooltip
+                          formatter={(value: number) => [
+                            formatCurrency(value),
+                            "Valor",
+                          ]}
+                          labelFormatter={(label) => `Data: ${label}`}
+                          contentStyle={{
+                            backgroundColor: theme === "dark" ? "#1e293b" : "white",
+                            border: theme === "dark" ? "1px solid #475569" : "1px solid #e2e8f0",
+                            borderRadius: "12px",
+                            boxShadow: theme === "dark" 
+                              ? "0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2)"
+                              : "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+                            color: theme === "dark" ? "#f1f5f9" : "#1e293b",
+                            fontSize: "13px",
+                            fontWeight: "500",
+                          }}
+                          cursor={{ fill: theme === "dark" ? "rgba(148, 163, 184, 0.1)" : "rgba(148, 163, 184, 0.1)" }}
+                        />
+                        <Bar
+                          dataKey="total"
+                          fill="url(#colorGradient)"
+                          radius={[4, 4, 0, 0]}
+                          stroke={theme === "dark" ? "#1e40af" : "#3b82f6"}
+                          strokeWidth={1}
+                        />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* Gráfico de Linha */}
+                <div className="space-y-4">
+                  <h3 className={`text-lg font-semibold text-center transition-colors duration-200 ${
+                    theme === "dark" ? "text-slate-200" : "text-gray-700"
+                  }`}>
+                    Evolução Temporal (Linha)
+                  </h3>
+                  <div className="h-72">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart
+                        data={chartData}
+                        margin={{ top: 20, right: 20, left: 20, bottom: 60 }}
+                      >
+                        <CartesianGrid
+                          strokeDasharray="3 3"
+                          stroke={theme === "dark" ? "#475569" : "#e2e8f0"}
+                          opacity={0.3}
+                        />
+                        <XAxis
+                          dataKey="formattedDate"
+                          angle={-45}
+                          textAnchor="end"
+                          height={80}
+                          tick={{
+                            fontSize: 11,
+                            fill: theme === "dark" ? "#94a3b8" : "#64748b",
+                            fontWeight: 500,
+                          }}
+                          axisLine={{ 
+                            stroke: theme === "dark" ? "#475569" : "#cbd5e1",
+                            strokeWidth: 1 
+                          }}
+                        />
+                        <YAxis
+                          tickFormatter={(value) => `R$ ${value}`}
+                          tick={{
+                            fontSize: 11,
+                            fill: theme === "dark" ? "#94a3b8" : "#64748b",
+                            fontWeight: 500,
+                          }}
+                          axisLine={{ 
+                            stroke: theme === "dark" ? "#475569" : "#cbd5e1",
+                            strokeWidth: 1 
+                          }}
+                        />
+                        <Tooltip
+                          formatter={(value: number) => [
+                            formatCurrency(value),
+                            "Valor",
+                          ]}
+                          labelFormatter={(label) => `Data: ${label}`}
+                          contentStyle={{
+                            backgroundColor: theme === "dark" ? "#1e293b" : "white",
+                            border: theme === "dark" ? "1px solid #475569" : "1px solid #e2e8f0",
+                            borderRadius: "12px",
+                            boxShadow: theme === "dark" 
+                              ? "0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2)"
+                              : "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+                            color: theme === "dark" ? "#f1f5f9" : "#1e293b",
+                            fontSize: "13px",
+                            fontWeight: "500",
+                          }}
+                          cursor={{ fill: theme === "dark" ? "rgba(148, 163, 184, 0.1)" : "rgba(148, 163, 184, 0.1)" }}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="total"
+                          stroke={theme === "dark" ? "#60a5fa" : "#3b82f6"}
+                          strokeWidth={3}
+                          dot={{ 
+                            fill: theme === "dark" ? "#60a5fa" : "#3b82f6", 
+                            strokeWidth: 2, 
+                            r: 4,
+                            stroke: theme === "dark" ? "#1e293b" : "white"
+                          }}
+                          activeDot={{ 
+                            r: 6, 
+                            stroke: theme === "dark" ? "#60a5fa" : "#3b82f6", 
+                            strokeWidth: 2,
+                            fill: theme === "dark" ? "#60a5fa" : "#3b82f6"
+                          }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
               </div>
 
               {/* Gradiente para as barras */}
@@ -638,73 +794,21 @@ export default function EstatisticasPage() {
                     x2="0"
                     y2="1"
                   >
-                    <stop offset="0%" stopColor="#3b82f6" />
-                    <stop offset="100%" stopColor="#1d4ed8" />
+                    <stop offset="0%" stopColor={theme === "dark" ? "#60a5fa" : "#3b82f6"} />
+                    <stop offset="50%" stopColor={theme === "dark" ? "#3b82f6" : "#2563eb"} />
+                    <stop offset="100%" stopColor={theme === "dark" ? "#1d4ed8" : "#1d4ed8"} />
                   </linearGradient>
                 </defs>
               </svg>
-
-              {/* Gráfico de Linha */}
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart
-                    data={chartData}
-                    margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
-                  >
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      stroke={theme === "dark" ? "#e2e8f0" : "#f0f0f0"}
-                    />
-                    <XAxis
-                      dataKey="formattedDate"
-                      angle={-45}
-                      textAnchor="end"
-                      height={80}
-                      tick={{
-                        fontSize: 12,
-                        fill: theme === "dark" ? "#64748b" : "#374151",
-                      }}
-                    />
-                    <YAxis
-                      tickFormatter={(value) => `R$ ${value}`}
-                      tick={{
-                        fontSize: 12,
-                        fill: theme === "dark" ? "#64748b" : "#374151",
-                      }}
-                    />
-                    <Tooltip
-                      formatter={(value: number) => [
-                        formatCurrency(value),
-                        "Valor",
-                      ]}
-                      labelFormatter={(label) => `Data: ${label}`}
-                      contentStyle={{
-                        backgroundColor: theme === "dark" ? "white" : "white",
-                        border:
-                          theme === "dark"
-                            ? "1px solid #e2e8f0"
-                            : "1px solid #e5e7eb",
-                        borderRadius: "8px",
-                        boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-                        color: theme === "dark" ? "#1e293b" : "#111827",
-                      }}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="total"
-                      stroke="#3b82f6"
-                      strokeWidth={3}
-                      dot={{ fill: "#3b82f6", strokeWidth: 2, r: 6 }}
-                      activeDot={{ r: 8, stroke: "#3b82f6", strokeWidth: 2 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
+            </>
           ) : (
-            <div className="text-center py-12 text-gray-500">
+            <div className={`text-center py-12 transition-colors duration-200 ${
+              theme === "dark" ? "text-slate-400" : "text-gray-500"
+            }`}>
               <svg
-                className="w-16 h-16 mx-auto mb-4 text-gray-300"
+                className={`w-16 h-16 mx-auto mb-4 transition-colors duration-200 ${
+                  theme === "dark" ? "text-slate-600" : "text-gray-300"
+                }`}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -716,8 +820,14 @@ export default function EstatisticasPage() {
                   d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
                 />
               </svg>
-              <p className="text-lg font-medium">Nenhuma venda registrada</p>
-              <p className="text-sm">
+              <p className={`text-lg font-medium transition-colors duration-200 ${
+                theme === "dark" ? "text-slate-300" : "text-gray-700"
+              }`}>
+                Nenhuma venda registrada
+              </p>
+              <p className={`text-sm transition-colors duration-200 ${
+                theme === "dark" ? "text-slate-400" : "text-gray-500"
+              }`}>
                 As vendas aparecerão aqui quando forem cadastradas
               </p>
             </div>
