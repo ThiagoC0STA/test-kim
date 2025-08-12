@@ -72,3 +72,50 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+export async function GET(req: NextRequest) {
+  const auth = await requireAuth(req);
+  if (!auth.ok) return auth.response!;
+
+  try {
+    // Buscar vendas com informações do cliente
+    const { data, error } = await supabase
+      .from("sales")
+      .select(
+        `
+        id,
+        value,
+        date,
+        clients (
+          id,
+          name,
+          email
+        )
+      `
+      )
+      .order("date", { ascending: false });
+
+    if (error) {
+      return NextResponse.json(
+        { message: "Erro ao carregar vendas", error: error.message },
+        { status: 500 }
+      );
+    }
+
+    // Formatar resposta
+    const formattedSales = data.map((sale: any) => ({
+      id: sale.id,
+      clientId: sale.clients?.id,
+      clientName: sale.clients?.name || "Cliente não encontrado",
+      value: Number(sale.value),
+      date: sale.date,
+    }));
+
+    return NextResponse.json(formattedSales);
+  } catch (error: any) {
+    return NextResponse.json(
+      { message: "Erro interno do servidor" },
+      { status: 500 }
+    );
+  }
+}

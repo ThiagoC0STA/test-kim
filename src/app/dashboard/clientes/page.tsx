@@ -6,26 +6,29 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useApi } from '@/hooks/useApi';
 import { firstMissingAlphabetLetter } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 
-// Schema para criação de cliente
+// Schemas de validação
 const CreateClientSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
   email: z.string().email('E-mail inválido'),
   birthDate: z.string().min(1, 'Data de nascimento é obrigatória'),
 });
 
+const UpdateClientSchema = CreateClientSchema.partial();
+
 type CreateClientForm = z.infer<typeof CreateClientSchema>;
+type UpdateClientForm = z.infer<typeof UpdateClientSchema>;
 
-// Interface para cliente normalizado
-interface Client {
-  id: string;
-  name: string;
-  email: string;
-  birthDate: string;
-  missingLetter: string;
-}
-
-// Interface para resposta "desorganizada" da API
+// Interfaces
 interface RawClientResponse {
   data: {
     clientes: Array<{
@@ -51,21 +54,32 @@ interface RawClientResponse {
   redundante?: any;
 }
 
+interface Client {
+  id: string;
+  name: string;
+  email: string;
+  birthDate: string;
+  missingLetter: string;
+}
+
 export default function ClientesPage() {
   const { get, post, patch, delete: del } = useApi();
   const [clients, setClients] = useState<Client[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [filters, setFilters] = useState({ name: '', email: '' });
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
+  const [filters, setFilters] = useState({ name: '', email: '' });
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors, isSubmitting },
-  } = useForm<CreateClientForm>({
+  // Formulários
+  const createForm = useForm<CreateClientForm>({
     resolver: zodResolver(CreateClientSchema),
+    defaultValues: { name: '', email: '', birthDate: '' },
+  });
+
+  const updateForm = useForm<UpdateClientForm>({
+    resolver: zodResolver(UpdateClientSchema),
   });
 
   // Normalizar dados da API
@@ -75,11 +89,11 @@ export default function ClientesPage() {
         const name = item.info?.nomeCompleto || item.duplicado?.nomeCompleto || '';
         const email = item.info?.detalhes?.email || '';
         const birthDate = item.info?.detalhes?.nascimento || '';
-        
+
         if (!name || !email) return null;
-        
+
         return {
-          id: Math.random().toString(36).substr(2, 9), // ID temporário
+          id: Math.random().toString(36).substr(2, 9), // ID temporário para frontend
           name,
           email,
           birthDate,
@@ -96,295 +110,344 @@ export default function ClientesPage() {
 
     try {
       const queryParams = new URLSearchParams();
-      if (filters.name) queryParams.set('name', filters.name);
-      if (filters.email) queryParams.set('email', filters.email);
+      if (filters.name) queryParams.append('name', filters.name);
+      if (filters.email) queryParams.append('email', filters.email);
 
       const response = await get(`/clients?${queryParams.toString()}`);
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao carregar clientes');
-      }
+      if (!response.ok) throw new Error('Erro ao carregar clientes');
 
-      const rawData: RawClientResponse = await response.json();
-      const normalizedClients = normalizeClients(rawData);
+      const data = await response.json();
+      const normalizedClients = normalizeClients(data);
       setClients(normalizedClients);
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || 'Erro ao carregar clientes');
     } finally {
       setIsLoading(false);
     }
   };
 
   // Criar cliente
-  const onCreateClient = async (data: CreateClientForm) => {
+  const createClient = async (data: CreateClientForm) => {
     try {
       const response = await post('/clients', data);
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao criar cliente');
-      }
+      if (!response.ok) throw new Error('Erro ao criar cliente');
 
-      reset();
+      setIsCreateDialogOpen(false);
+      createForm.reset();
       loadClients();
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || 'Erro ao criar cliente');
     }
   };
 
-  // Editar cliente
-  const onEditClient = async (client: Client) => {
-    setEditingClient(client);
-  };
-
-  // Salvar edição
-  const onSaveEdit = async (data: CreateClientForm) => {
+  // Atualizar cliente
+  const updateClient = async (data: UpdateClientForm) => {
     if (!editingClient) return;
 
     try {
       const response = await patch(`/clients?id=${editingClient.id}`, data);
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao atualizar cliente');
-      }
+      if (!response.ok) throw new Error('Erro ao atualizar cliente');
 
+      setIsEditDialogOpen(false);
       setEditingClient(null);
+      updateForm.reset();
       loadClients();
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || 'Erro ao atualizar cliente');
     }
   };
 
   // Deletar cliente
-  const onDeleteClient = async (client: Client) => {
-    if (!confirm(`Tem certeza que deseja deletar ${client.name}?`)) return;
+  const deleteClient = async (clientId: string) => {
+    if (!confirm('Tem certeza que deseja deletar este cliente?')) return;
 
     try {
-      const response = await del(`/clients?id=${client.id}`);
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao deletar cliente');
-      }
+      const response = await del(`/clients?id=${clientId}`);
+      if (!response.ok) throw new Error('Erro ao deletar cliente');
 
       loadClients();
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || 'Erro ao deletar cliente');
     }
   };
 
-  // Carregar clientes quando filtros mudarem
+  // Abrir diálogo de edição
+  const openEditDialog = (client: Client) => {
+    setEditingClient(client);
+    updateForm.reset({
+      name: client.name,
+      email: client.email,
+      birthDate: client.birthDate,
+    });
+    setIsEditDialogOpen(true);
+  };
+
+  // Carregar clientes ao montar componente
   useEffect(() => {
     loadClients();
-  }, [filters.name, filters.email]);
+  }, []);
+
+  // Aplicar filtros
+  useEffect(() => {
+    loadClients();
+  }, [filters]);
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900">Gerenciar Clientes</h2>
-        <p className="mt-1 text-sm text-gray-500">
-          Adicione, edite e gerencie os clientes da sua loja
-        </p>
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight text-gray-900">Gerenciar Clientes</h2>
+          <p className="text-gray-600 mt-2">
+            Cadastre, edite e gerencie todos os clientes da loja
+          </p>
+        </div>
+        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              Novo Cliente
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Adicionar Novo Cliente</DialogTitle>
+              <DialogDescription>
+                Preencha os dados do novo cliente
+              </DialogDescription>
+            </DialogHeader>
+            <Form {...createForm}>
+              <form onSubmit={createForm.handleSubmit(createClient)} className="space-y-4">
+                <FormField
+                  control={createForm.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nome Completo</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Nome do cliente" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={createForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>E-mail</FormLabel>
+                      <FormControl>
+                        <Input {...field} type="email" placeholder="cliente@email.com" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={createForm.control}
+                  name="birthDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Data de Nascimento</FormLabel>
+                      <FormControl>
+                        <Input {...field} type="date" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="flex justify-end space-x-2 pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsCreateDialogOpen(false)}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button type="submit">Criar Cliente</Button>
+                </div>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Filtros */}
-      <div className="bg-white shadow rounded-lg p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Filtros</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Nome
-            </label>
-            <input
-              type="text"
-              value={filters.name}
-              onChange={(e) => setFilters(prev => ({ ...prev, name: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Filtrar por nome..."
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              E-mail
-            </label>
-            <input
-              type="email"
-              value={filters.email}
-              onChange={(e) => setFilters(prev => ({ ...prev, email: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Filtrar por e-mail..."
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Formulário de criação */}
-      <div className="bg-white shadow rounded-lg p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">
-          {editingClient ? 'Editar Cliente' : 'Adicionar Novo Cliente'}
-        </h3>
-        
-        <form onSubmit={handleSubmit(editingClient ? onSaveEdit : onCreateClient)} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <Card>
+        <CardHeader>
+          <CardTitle>Filtros</CardTitle>
+          <CardDescription>
+            Filtre os clientes por nome ou e-mail
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Nome Completo
-              </label>
-              <input
-                {...register('name')}
-                defaultValue={editingClient?.name}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Nome do cliente"
+              <Label htmlFor="name-filter">Nome</Label>
+              <Input
+                id="name-filter"
+                placeholder="Filtrar por nome..."
+                value={filters.name}
+                onChange={(e) => setFilters(prev => ({ ...prev, name: e.target.value }))}
               />
-              {errors.name && (
-                <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
-              )}
             </div>
-
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                E-mail
-              </label>
-              <input
-                {...register('email')}
-                defaultValue={editingClient?.email}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="email@exemplo.com"
+              <Label htmlFor="email-filter">E-mail</Label>
+              <Input
+                id="email-filter"
+                placeholder="Filtrar por e-mail..."
+                value={filters.email}
+                onChange={(e) => setFilters(prev => ({ ...prev, email: e.target.value }))}
               />
-              {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Data de Nascimento
-              </label>
-              <input
-                {...register('birthDate')}
-                type="date"
-                defaultValue={editingClient?.birthDate}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-              {errors.birthDate && (
-                <p className="mt-1 text-sm text-red-600">{errors.birthDate.message}</p>
-              )}
             </div>
           </div>
+        </CardContent>
+      </Card>
 
-          <div className="flex gap-3">
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSubmitting ? 'Salvando...' : (editingClient ? 'Atualizar' : 'Adicionar')}
-            </button>
-            
-            {editingClient && (
-              <button
-                type="button"
-                onClick={() => {
-                  setEditingClient(null);
-                  reset();
-                }}
-                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-              >
-                Cancelar
-              </button>
-            )}
-          </div>
-        </form>
-      </div>
+      {/* Erro */}
+      {error && (
+        <Card className="border-red-200 bg-red-50">
+          <CardContent className="pt-6">
+            <p className="text-red-700 font-medium">{error}</p>
+          </CardContent>
+        </Card>
+      )}
 
-      {/* Lista de clientes */}
-      <div className="bg-white shadow rounded-lg">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900">
-            Clientes ({clients.length})
-          </h3>
-        </div>
-
-        {error && (
-          <div className="px-6 py-4 bg-red-50 border-b border-red-200">
-            <p className="text-sm text-red-600">{error}</p>
-          </div>
-        )}
-
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Nome
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  E-mail
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Nascimento
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Letra Ausente
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Ações
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {isLoading ? (
-                <tr>
-                  <td colSpan={5} className="px-6 py-4 text-center text-sm text-gray-500">
-                    Carregando clientes...
-                  </td>
-                </tr>
-              ) : clients.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="px-6 py-4 text-center text-sm text-gray-500">
-                    Nenhum cliente encontrado
-                  </td>
-                </tr>
-              ) : (
-                clients.map((client) => (
-                  <tr key={client.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {client.name}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {client.email}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+      {/* Tabela de Clientes */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Clientes ({clients.length})</CardTitle>
+          <CardDescription>
+            Lista completa de clientes cadastrados
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+              <span className="ml-2 text-gray-600">Carregando clientes...</span>
+            </div>
+          ) : clients.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              Nenhum cliente encontrado
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nome</TableHead>
+                  <TableHead>E-mail</TableHead>
+                  <TableHead>Data de Nascimento</TableHead>
+                  <TableHead>Letra Ausente</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {clients.map((client) => (
+                  <TableRow key={client.id}>
+                    <TableCell className="font-medium">{client.name}</TableCell>
+                    <TableCell>{client.email}</TableCell>
+                    <TableCell>
                       {new Date(client.birthDate).toLocaleDateString('pt-BR')}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 font-mono">
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={client.missingLetter === '-' ? 'default' : 'secondary'}>
                         {client.missingLetter}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                      <button
-                        onClick={() => onEditClient(client)}
-                        className="text-blue-600 hover:text-blue-900"
-                      >
-                        Editar
-                      </button>
-                      <button
-                        onClick={() => onDeleteClient(client)}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        Deletar
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => openEditDialog(client)}
+                        >
+                          Editar
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => deleteClient(client.id)}
+                        >
+                          Deletar
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Diálogo de Edição */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Editar Cliente</DialogTitle>
+            <DialogDescription>
+              Modifique os dados do cliente
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...updateForm}>
+            <form onSubmit={updateForm.handleSubmit(updateClient)} className="space-y-4">
+              <FormField
+                control={updateForm.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nome Completo</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Nome do cliente" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={updateForm.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>E-mail</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="email" placeholder="cliente@email.com" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={updateForm.control}
+                name="birthDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Data de Nascimento</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="date" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex justify-end space-x-2 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsEditDialogOpen(false)}
+                >
+                  Cancelar
+                </Button>
+                <Button type="submit">Salvar Alterações</Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

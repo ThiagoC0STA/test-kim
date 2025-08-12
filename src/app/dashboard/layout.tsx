@@ -85,6 +85,12 @@ export default function DashboardLayout({
               Clientes
             </Link>
             <Link
+              href="/dashboard/vendas"
+              className="py-4 px-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300 transition-colors"
+            >
+              Vendas
+            </Link>
+            <Link
               href="/dashboard/estatisticas"
               className="py-4 px-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300 transition-colors"
             >

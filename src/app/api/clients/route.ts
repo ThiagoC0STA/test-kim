@@ -82,7 +82,6 @@ export async function GET(req: NextRequest) {
     const name = searchParams.get("name");
     const email = searchParams.get("email");
 
-    // Construir query com filtros
     let query = supabase.from("clients").select("id, name, email, birth_date");
 
     if (name) {
@@ -102,10 +101,10 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Formato "desorganizado" conforme especificado
     const response = {
       data: {
         clientes: data.map((client) => ({
+          id: client.id, // Usar o ID real do Supabase
           info: {
             nomeCompleto: client.name,
             detalhes: {
@@ -117,7 +116,7 @@ export async function GET(req: NextRequest) {
             nomeCompleto: client.name,
           },
           estatisticas: {
-            vendas: [], // Será populado quando implementarmos vendas
+            vendas: [],
           },
         })),
       },

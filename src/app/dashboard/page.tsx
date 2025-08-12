@@ -78,7 +78,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <Button asChild variant="outline" className="w-full">
-              <Link href="/dashboard/clientes">
+              <Link href="/dashboard/vendas">
                 Nova Venda
               </Link>
             </Button>
