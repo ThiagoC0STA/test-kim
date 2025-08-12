@@ -11,7 +11,8 @@ describe("useApi Hook", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUseAuth = require("@/contexts/AuthContext").useAuth;
+    const { useAuth } = jest.requireMock("@/contexts/AuthContext");
+    mockUseAuth = useAuth;
     mockUseAuth.mockReturnValue({
       session: { access_token: "test-token" },
     });

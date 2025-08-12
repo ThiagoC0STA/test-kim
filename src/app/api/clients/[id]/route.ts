@@ -9,10 +9,7 @@ const UpdateSchema = z.object({
   birthDate: z.string().optional(),
 });
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(req: NextRequest, { params }: any) {
   const auth = await requireAuth(req);
   if (!auth.ok) return auth.response!;
   try {
@@ -47,10 +44,7 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(req: NextRequest, { params }: any) {
   const auth = await requireAuth(req);
   if (!auth.ok) return auth.response!;
   const { error } = await supabase.from("clients").delete().eq("id", params.id);
